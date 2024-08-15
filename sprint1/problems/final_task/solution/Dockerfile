@@ -6,12 +6,12 @@ RUN apt update && \
       python3-pip \
       cmake \
     && \
-    pip3 install conan
+    pip3 install conan==1.*
 
 # Запуск conan как раньше
 COPY conanfile.txt /app/
 RUN mkdir /app/build && cd /app/build && \
-    conan install .. --build=1.*
+    conan install .. --build=missing
 
 # Папка data больше не нужна
 COPY ./src /app/src
