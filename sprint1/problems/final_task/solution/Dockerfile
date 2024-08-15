@@ -11,7 +11,7 @@ RUN apt update && \
 # Запуск conan как раньше
 COPY conanfile.txt /app/
 RUN mkdir /app/build && cd /app/build && \
-	conan profile detect \
+	conan profile detect && \
     conan install .. --build=missing
 
 # Папка data больше не нужна
