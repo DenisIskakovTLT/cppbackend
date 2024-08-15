@@ -23,7 +23,7 @@ namespace responceHandler{
         const model::Game& game) {
         StringResponse response(http::status::ok, req.version());
         response.set(http::field::content_type, "application/json");
-        response.body() = jsonConverter::ConvertMapListToJson(game);
+        response.body() = jsonOperation::GameToJson(game);
         response.content_length(response.body().size());
         response.keep_alive(req.keep_alive());
         return response;
@@ -31,8 +31,8 @@ namespace responceHandler{
 
     template <typename Body, typename Allocator>
     bool GetMapByIdCheck(const http::request<Body, http::basic_fields<Allocator>>& req, const model::Game& game) {
-        auto tmpStr = SplitUrl(req.target());
-        return (tmpStr.size() == 4) && (tmpStr[0] == "api") && (tmpStr[1] == "v1") && (utmpStrrl[2] == "maps") && (game.FindMap(model::Map::Id(std::string(tmpStr[3]))) != nullptr);
+        auto tmpStr = SplitStr(req.target());
+        return (tmpStr.size() == 4) && (tmpStr[0] == "api") && (tmpStr[1] == "v1") && (tmpStr[2] == "maps") && (game.FindMap(model::Map::Id(std::string(tmpStr[3]))) != nullptr);
     }
 
     template <typename Body, typename Allocator>
@@ -40,7 +40,7 @@ namespace responceHandler{
         http::response<http::string_body> response(http::status::ok, req.version());
         auto id = SplitStr(req.target())[3];
         response.set(http::field::content_type, "application/json");
-        response.body() = jsonConverter::ConvertMapToJson(*game.FindMap(model::Map::Id(std::string(id))));
+        response.body() = jsonOperation::MapToJson(*game.FindMap(model::Map::Id(std::string(id))));
         response.content_length(response.body().size());
         response.keep_alive(req.keep_alive());
         return response;
@@ -57,7 +57,7 @@ namespace responceHandler{
     StringResponse BadRequest(const http::request<Body, http::basic_fields<Allocator>>& req, const model::Game& game) {
         StringResponse response(http::status::bad_request, req.version());
         response.set(http::field::content_type, "application/json");
-        response.body() = jsonConverter::CreateBadRequestResponse();
+        response.body() = jsonOperation::BadRequest();
         response.content_length(response.body().size());
         response.keep_alive(req.keep_alive());
         return response;
@@ -70,10 +70,10 @@ namespace responceHandler{
     };
 
     template <typename Body, typename Allocator>
-    StringResponse MakeMapNotFound(const http::request<Body, http::basic_fields<Allocator>>& req, const model::Game& game) {
+    StringResponse MapNotFound(const http::request<Body, http::basic_fields<Allocator>>& req, const model::Game& game) {
         StringResponse response(http::status::not_found, req.version());
         response.set(http::field::content_type, "application/json");
-        response.body() = jsonConverter::CreateMapNotFoundResponse();
+        response.body() = jsonOperation::MapNotFound();
         response.content_length(response.body().size());
         response.keep_alive(req.keep_alive());
         return response;
@@ -83,7 +83,7 @@ namespace responceHandler{
     StringResponse PageNotFound(const http::request<Body, http::basic_fields<Allocator>>& req, const model::Game& game) {
         StringResponse response(http::status::not_found, req.version());
         response.set(http::field::content_type, "application/json");
-        response.body() = jsonConverter::CreatePageNotFoundResponse();
+        response.body() = jsonOperation::PageNotFound();
         response.content_length(response.body().size());
         response.keep_alive(req.keep_alive());
         return response;

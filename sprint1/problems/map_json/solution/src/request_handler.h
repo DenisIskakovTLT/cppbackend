@@ -31,9 +31,9 @@ namespace http_handler {
                 if (req.method() == http::verb::get) send(responceHandler::MapNotFound(req, game_));
                 else send(responceHandler::BadRequest(req, game_));
             }
-            else if (responceHandler::MapByIdCheck(req, game_)) {
+            else if (responceHandler::GetMapByIdCheck(req, game_)) {
                 if (req.method() == http::verb::get) send(responceHandler::GetMapById(req, game_));
-                else send(responceHandler::BadRequeste(req, game_));
+                else send(responceHandler::BadRequest(req, game_));
             }
             else {
                 send(responceHandler::PageNotFound(req, game_));
