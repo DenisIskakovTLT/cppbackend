@@ -1,16 +1,16 @@
-#include "json_handler.h"
+п»ї#include "json_handler.h"
 #include <map>
 #include <sstream>
-#include <json/json.h>                                                  //замена бустовской либы, с ней удобнее
+#include <json/json.h>                                                  //Р·Р°РјРµРЅР° Р±СѓСЃС‚РѕРІСЃРєРѕР№ Р»РёР±С‹, СЃ РЅРµР№ СѓРґРѕР±РЅРµРµ
 
 namespace jsonOperation {
 
     std::string GameToJson(const model::Game& game) {
         Json::Value root;
         Json::StreamWriterBuilder builder;
-        const std::unique_ptr<Json::StreamWriter> writer(builder.newStreamWriter());        //Поток записи
+        const std::unique_ptr<Json::StreamWriter> writer(builder.newStreamWriter());        //РџРѕС‚РѕРє Р·Р°РїРёСЃРё
 
-        for (const auto &item : game.GetMaps()) {                                           //Идём по всему файлу, вычленяем мапы и парсим айди и имя
+        for (const auto &item : game.GetMaps()) {                                           //РРґС‘Рј РїРѕ РІСЃРµРјСѓ С„Р°Р№Р»Сѓ, РІС‹С‡Р»РµРЅСЏРµРј РјР°РїС‹ Рё РїР°СЂСЃРёРј Р°Р№РґРё
             Json::Value map;
             map["id"] = (*item.GetId()).c_str();
             map["name"] = item.GetName().c_str();
@@ -25,7 +25,7 @@ namespace jsonOperation {
     void AddRoads(const model::Map& map, Json::Value& root) {
         Json::Value roads;
 
-        for (const auto &item : map.GetRoads()) {                                           //Идём по мапе, вычленяем дороги и парсим координаты
+        for (const auto &item : map.GetRoads()) {                                           //РРґС‘Рј РїРѕ РјР°РїРµ, РІС‹С‡Р»РµРЅСЏРµРј РґРѕСЂРѕРіРё Рё РїР°СЂСЃРёРј РєРѕРѕСЂРґРёРЅР°С‚С‹
             Json::Value road;
             road["x0"] = item.GetStart().x;
             road["y0"] = item.GetStart().y;
@@ -40,7 +40,7 @@ namespace jsonOperation {
     void AddBuildings(const model::Map& map, Json::Value& root) {
         Json::Value buildings;
 
-        for (const auto &item : map.GetBuildings()) {                                       //Идём по мапе, вычленяем здания и парсим координаты
+        for (const auto &item : map.GetBuildings()) {                                       //РРґС‘Рј РїРѕ РјР°РїРµ, РІС‹С‡Р»РµРЅСЏРµРј Р·РґР°РЅРёСЏ Рё РїР°СЂСЃРёРј РєРѕРѕСЂРґРёРЅР°С‚С‹
             Json::Value building;
             building["x"] = item.GetBounds().position.x;
             building["y"] = item.GetBounds().position.y;
@@ -55,7 +55,7 @@ namespace jsonOperation {
     void AddOffices(const model::Map& map, Json::Value& root) {                             
         Json::Value offices;
 
-        for (auto item : map.GetOffices()) {                                                    //Идём по мапе, вычленяем офисы и парсим координаты
+        for (auto item : map.GetOffices()) {                                                    //РРґС‘Рј РїРѕ РјР°РїРµ, РІС‹С‡Р»РµРЅСЏРµРј РѕС„РёСЃС‹ Рё РїР°СЂСЃРёРј РєРѕРѕСЂРґРёРЅР°С‚С‹
             Json::Value office;
             office["id"] = (*item.GetId()).c_str();
             office["x"] = item.GetPosition().x;

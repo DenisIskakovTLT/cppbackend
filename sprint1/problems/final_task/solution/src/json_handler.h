@@ -1,15 +1,15 @@
-#pragma once
+п»ї#pragma once
 #include "model.h"
 #include <string>
 
 
 namespace jsonOperation {
 
-	std::string GameToJson(const model::Game& game);			//Конвертер всего в строку
-	std::string MapToJson(const model::Map& map);				//Конвертер мапы в строку
+	std::string GameToJson(const model::Game& game);			//РљРѕРЅРІРµСЂС‚РµСЂ РІСЃРµРіРѕ РІ СЃС‚СЂРѕРєСѓ
+	std::string MapToJson(const model::Map& map);				//РљРѕРЅРІРµСЂС‚РµСЂ РјР°РїС‹ РІ СЃС‚СЂРѕРєСѓ
 
-	std::string PageNotFound();									//Выдать, что страница не найдена
-	std::string BadRequest();									//Выдать, что кривой запрос
-	std::string MapNotFound();									//Выдать, что карту не нашел
+	std::string PageNotFound();									//Р’С‹РґР°С‚СЊ, С‡С‚Рѕ СЃС‚СЂР°РЅРёС†Р° РЅРµ РЅР°Р№РґРµРЅР°
+	std::string BadRequest();									//Р’С‹РґР°С‚СЊ, С‡С‚Рѕ РєСЂРёРІРѕР№ Р·Р°РїСЂРѕСЃ
+	std::string MapNotFound();									//Р’С‹РґР°С‚СЊ, С‡С‚Рѕ РєР°СЂС‚Сѓ РЅРµ РЅР°С€РµР»
 
 }

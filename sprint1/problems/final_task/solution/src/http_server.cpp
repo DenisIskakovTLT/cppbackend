@@ -1,4 +1,4 @@
-#include "http_server.h"
+п»ї#include "http_server.h"
 
 #include <boost/asio/dispatch.hpp>
 #include <iostream>
@@ -24,15 +24,15 @@ SessionBase::SessionBase(tcp::socket&& socket)
 void SessionBase::Read() {
     using namespace std::literals;
     
-    request_ = {};                                                                                                  //Стираем старый запрос
+    request_ = {};                                                                                                  //РЎС‚РёСЂР°РµРј СЃС‚Р°СЂС‹Р№ Р·Р°РїСЂРѕСЃ
     stream_.expires_after(std::chrono::seconds(20));
-    http::async_read(stream_, buffer_, request_, beast::bind_front_handler(&SessionBase::OnRead, GetSharedThis())); //Считали, и вызвали OnRead
+    http::async_read(stream_, buffer_, request_, beast::bind_front_handler(&SessionBase::OnRead, GetSharedThis())); //РЎС‡РёС‚Р°Р»Рё, Рё РІС‹Р·РІР°Р»Рё OnRead
 }
 
 void SessionBase::OnRead(beast::error_code ec, [[maybe_unused]] std::size_t bytes_read) {
     using namespace std::literals;
     if (ec == http::error::end_of_stream) {
-                return Close();                         //Закрыто по инициативе клиента
+                return Close();                         //Р—Р°РєСЂС‹С‚Рѕ РїРѕ РёРЅРёС†РёР°С‚РёРІРµ РєР»РёРµРЅС‚Р°
     }
     if (ec) {
         return ErrorMessage(ec, "Read Error"sv);
@@ -57,7 +57,7 @@ void SessionBase::OnWrite(bool close, beast::error_code ec, [[maybe_unused]] std
     }
 
  
-    Read();                     //Читаем сл. запрос
+    Read();                     //Р§РёС‚Р°РµРј СЃР». Р·Р°РїСЂРѕСЃ
 }
 
 }  // namespace http_server

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "model.h"
 #include "json_handler.h"
 #include <vector>
@@ -9,6 +9,10 @@ namespace responceHandler{
     namespace beast = boost::beast;
     namespace http = beast::http;
     using StringResponse = http::response<http::string_body>;
+
+    const size_t TWO_SEGMENT_SIZE = 2;
+    const size_t THREE_SEGMENT_SIZE = 3;
+    const size_t FOUR_SEGMENT_SIZE = 4;
 
     std::vector<std::string_view> SplitStr(std::string_view str);
 
@@ -32,7 +36,11 @@ namespace responceHandler{
     template <typename Body, typename Allocator>
     bool GetMapByIdCheck(const http::request<Body, http::basic_fields<Allocator>>& req, const model::Game& game) {
         auto tmpStr = SplitStr(req.target());
-        return (tmpStr.size() == 4) && (tmpStr[0] == "api") && (tmpStr[1] == "v1") && (tmpStr[2] == "maps") && (game.FindMap(model::Map::Id(std::string(tmpStr[3]))) != nullptr);
+        return tmpStr.size() == FOUR_SEGMENT_SIZE &&
+            tmpStr[0] == "api" &&
+            tmpStr[1] == "v1" &&
+            tmpStr[2] == "maps" &&
+            game.FindMap(model::Map::Id(std::string(tmpStr[3]))) != nullptr;
     }
 
     template <typename Body, typename Allocator>
@@ -50,7 +58,16 @@ namespace responceHandler{
     template <typename Body, typename Allocator>
     bool BadRequestCheck(const http::request<Body, http::basic_fields<Allocator>>& req,const model::Game& game) {
         auto tmpStr = SplitStr(req.target());
-        return (!tmpStr.empty()) && (tmpStr[0] == "api") && ((tmpStr.size() > 4) || (tmpStr.size() < 3) || ((tmpStr.size() >= 2) && (tmpStr[1] != "v1")) || ((tmpStr.size() >= 3) && (tmpStr[2] != "maps")));
+        return !tmpStr.empty() &&
+            tmpStr[0] == "api" &&
+            (
+                tmpStr.size() > FOUR_SEGMENT_SIZE ||
+                tmpStr.size() < THREE_SEGMENT_SIZE ||
+                (tmpStr.size() >= TWO_SEGMENT_SIZE &&
+                    tmpStr[1] != "v1") ||
+                (tmpStr.size() >= THREE_SEGMENT_SIZE &&
+                    tmpStr[2] != "maps")
+                );
     };
 
     template <typename Body, typename Allocator>
@@ -66,7 +83,11 @@ namespace responceHandler{
     template <typename Body, typename Allocator>
     bool MapNotFoundCheck(const http::request<Body, http::basic_fields<Allocator>>& req, const model::Game& game) {
         auto tmpStr = SplitStr(req.target());
-        return (tmpStr.size() == 4) && (tmpStr[0] == "api") && (tmpStr[1] == "v1") && (tmpStr[2] == "maps") && (game.FindMap(model::Map::Id(std::string(tmpStr[3]))) == nullptr);
+        return tmpStr.size() == FOUR_SEGMENT_SIZE &&
+            tmpStr[0] == "api" &&
+            tmpStr[1] == "v1" &&
+            tmpStr[2] == "maps" &&
+            game.FindMap(model::Map::Id(std::string(tmpStr[3]))) == nullptr;
     };
 
     template <typename Body, typename Allocator>

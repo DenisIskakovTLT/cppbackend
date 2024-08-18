@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "sdk.h"
 // boost.beast будет использовать std::string_view вместо boost::string_view
 #define BOOST_BEAST_USE_STD_STRING_VIEW
@@ -37,8 +37,9 @@ protected:
 
     ~SessionBase() = default;                                           //Деструктор
 
-    
-    explicit SessionBase(tcp::socket && socket);                        //Конструктор c explicit, чтобы не было никаких приведений типа, только явно. У наследников будет тоже самое т.к. protected
+    /*Конструктор c explicit, чтобы не было никаких приведений типа, только явно.
+    У наследников будет тоже самое т.к. protected*/
+    explicit SessionBase(tcp::socket && socket);                        
 
     /*Из теории*/
     template <typename Body, typename Fields>
