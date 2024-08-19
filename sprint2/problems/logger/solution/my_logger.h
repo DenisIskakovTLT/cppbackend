@@ -3,20 +3,20 @@
 #include <chrono>
 #include <iomanip>
 #include <fstream>
+#include <iterator>
 #include <sstream>
 #include <string>
 #include <string_view>
 #include <optional>
 #include <mutex>
-#include <shared_mutex>
 #include <thread>
-#include <algorithm>
 
 using namespace std::literals;
 
 #define LOG(...) Logger::GetInstance().Log(__VA_ARGS__)
 
 class Logger {
+
     auto GetTime() const {
         if (manual_ts_) {
             return *manual_ts_;
@@ -28,24 +28,27 @@ class Logger {
     auto GetTimeStamp() const {
         const auto now = GetTime();
         const auto t_c = std::chrono::system_clock::to_time_t(now);
-        return std::put_time(std::localtime(&t_c), "%F %T");
+        return std::put_time(std::gmtime(&t_c), "%F %T");
     }
 
-    // Для имени файла возьмите дату с форматом "%Y_%m_%d"
-    std::string GetFileTimeStamp() const{
-        std::stringstream ss;
+    std::string GetFileTimeStamp() const {
         const auto now = GetTime();
         const auto t_c = std::chrono::system_clock::to_time_t(now);
-        ss << std::put_time(std::localtime(&t_c), "%F");
-        std::string tmpStr = ss.str();
-        std::replace(tmpStr.begin(), tmpStr.end(), '-', '_');
-        return tmpStr;
-    };
+        std::stringstream ss;
+        ss << std::put_time(std::gmtime(&t_c), "%Y_%m_%d");
+        return ss.str();
+    }
 
-    Logger(){
-        std::string log_file = DIRECTORY + "sample_log_" + GetFileTimeStamp() + EXTENSION;
-        log_file_.open(log_file, std::ios::app);
-    };
+    template<typename T, class... Ts>
+    void Log(std::stringstream& ss, T value, const Ts&... args) {           //Рекурсивыный вывод
+        ss << value;
+        Log(ss, args...);
+    }
+
+    void Log(std::stringstream& ss) {
+    }
+
+    Logger() = default;
     Logger(const Logger&) = delete;
 
 public:
@@ -56,33 +59,31 @@ public:
 
     // Выведите в поток все аргументы.
     template<class... Ts>
-    void Log(const Ts&... args){
-        std::shared_lock guard(m_);
-        log_file_ << GetTimeStamp() << ": "sv;
-        ((log_file_ << args), ...);
-        log_file_ << std::endl;
-    };
-    
+    void Log(const Ts&... args) {
+        
+        std::stringstream ss;                               //Строковый поток
+        
+        ss << GetTimeStamp() << ": ";                       //Тайм стамп выводим
+        Log(ss, args...);                                   //Вызываем самого себя, рекурсивно
+        
+        std::string logDir("/var/log/sample_log_");         //Директрия
+        std::string extention(".log");                      //Расширение
+        const std::lock_guard<std::mutex> lock(fileM_);     //Захват мьютекса
+        std::ofstream log_file_{ logDir + GetFileTimeStamp() + extention, std::ios::app };      //открыли файл
+        log_file_ << ss.str() << std::endl;                 //вывалили в файл всё из потока
+    }
+
     // Установите manual_ts_. Учтите, что эта операция может выполняться
     // параллельно с выводом в поток, вам нужно предусмотреть 
     // синхронизацию.
-    void SetTimestamp(std::chrono::system_clock::time_point ts){
-        std::lock_guard guard(m_);
+    void SetTimestamp(std::chrono::system_clock::time_point ts) {
+        const std::lock_guard<std::mutex> lock(tsM__);
         manual_ts_ = ts;
-        log_file_.close();
-        std::string log_file = DIRECTORY + "sample log" + GetFileTimeStamp() + EXTENSION;
-        log_file_.open(log_file, std::ios::app);
-
-    };
-
-    ~Logger(){
-        log_file_.close();
     }
 
 private:
-    const std::string DIRECTORY{"/var/log/"};							//Директория
-    const std::string EXTENSION{".log"};								//Расширение
+
     std::optional<std::chrono::system_clock::time_point> manual_ts_;
-    mutable std::shared_mutex m_;										//Мьютекс
-    std::ofstream log_file_;											//Сам файл
+    std::mutex tsM__;													//Мьютекс для ts
+    std::mutex fileM_; 												    //Мьютекс для файла
 };
