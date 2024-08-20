@@ -67,7 +67,7 @@ protected:
         http::async_write(stream_, *safe_response,
             [safe_response, self](beast::error_code ec, std::size_t bytes_written) {
                 self->OnWrite(safe_response->need_eof(), ec, bytes_written);
-                BOOST_LOG_TRIVIAL(info) << logger::CreateLogMessage("Response sent"sv,
+                BOOST_LOG_TRIVIAL(info) << logger::CreateLogMessage("response sent"sv,
                     logger::ResponseLog<Body, Fields>(self->GetRemoteIp(),
                         self->GetDurReceivedRequest(boost::posix_time::microsec_clock::local_time()),
                         *safe_response));
