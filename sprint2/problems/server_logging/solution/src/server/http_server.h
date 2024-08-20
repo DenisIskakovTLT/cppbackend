@@ -113,7 +113,7 @@ private:
     /*Из теории*/
     void HandleRequest(HttpRequest&& request) override {
         SetReqRecieveTime(boost::posix_time::microsec_clock::local_time());
-        BOOST_LOG_TRIVIAL(info) << logger::CreateLogMessage("Request received"sv,
+        BOOST_LOG_TRIVIAL(info) << logger::CreateLogMessage("request received"sv,
             logger::RequestLog(GetRemoteIp(), request));
 
         // Захватываем умный указатель на текущий объект Session в лямбде,
