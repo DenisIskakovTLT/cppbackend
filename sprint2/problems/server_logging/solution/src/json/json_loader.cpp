@@ -1,7 +1,5 @@
-#include "json_loader.h"
+#include "../json/json_loader.h"
 #include "../logger/logger.h"
-#include <fstream>
-#include <boost/json.hpp>
 
 #include <fstream>
 #include <iostream>
@@ -11,16 +9,6 @@
 #include <iostream>
 
 namespace json_loader {
-
-    const std::string X_COORD = "x";
-    const std::string Y_COORD = "y";
-    const std::string W_COORD = "w";
-    const std::string H_COORD = "h";
-
-    const std::string X0_COORD = "x0";
-    const std::string Y0_COORD = "y0";
-    const std::string X1_COORD = "x1";
-    const std::string Y1_COORD = "y1";
 
     namespace json = boost::json;                                                                   //Тут бустом пользуемся
     using namespace std::literals;

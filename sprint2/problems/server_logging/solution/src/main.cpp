@@ -9,6 +9,7 @@
 #include "json/json_loader.h"
 #include "request/request_handler.h"
 #include "logger/logger.h"
+#define BOOST_USE_WINAPI_VERSION 0x0501
 
 using namespace std::literals;
 namespace net = boost::asio;
@@ -32,6 +33,8 @@ namespace {
 }  // namespace
 
 int main(int argc, const char* argv[]) {
+
+    logger::InitLogger();
     if (argc != 3) {
         BOOST_LOG_TRIVIAL(error) << logger::CreateLogMessage("Usage: game_server <game-config-json>"sv,
             logger::ExitCodeLog(EXIT_FAILURE));
@@ -40,11 +43,11 @@ int main(int argc, const char* argv[]) {
     try {
         // 1. Загружаем карту из файла и построить модель игры
         model::Game game = json_loader::LoadGame(argv[1]);
-        //model::Game game = json_loader::LoadGame("../../data/config.json");        //для дебага
+        //model::Game game = json_loader::LoadGame("../data/config.json");                    //для дебага
 
         // 2. Устанавливаем путь до статического контента.
         std::filesystem::path staticContentPath{ argv[2] };
-        //fs::path staticContentPath{"../../static"};                                //для дебага
+        //std::filesystem::path staticContentPath{"../static"};                                //для дебага
 
         // 3. Инициализируем io_context
         const unsigned num_threads = std::thread::hardware_concurrency();
