@@ -1,7 +1,8 @@
 #pragma once
 #include "../application/application.h"
 #include <string>
-
+#include <tuple>
+#include <optional>
 
 namespace jsonOperation {
 
