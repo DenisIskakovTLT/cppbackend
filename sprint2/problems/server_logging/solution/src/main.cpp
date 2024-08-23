@@ -11,7 +11,7 @@
 #include "logger/logger.h"
 #define BOOST_USE_WINAPI_VERSION 0x0501
 
-#define DEBUG
+//#define DEBUG
 
 using namespace std::literals;
 namespace net = boost::asio;
