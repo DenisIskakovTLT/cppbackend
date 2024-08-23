@@ -11,6 +11,8 @@
 #include "logger/logger.h"
 #define BOOST_USE_WINAPI_VERSION 0x0501
 
+#define DEBUG
+
 using namespace std::literals;
 namespace net = boost::asio;
 
@@ -43,13 +45,17 @@ int main(int argc, const char* argv[]) {
     //}
     try {
         // 1. Загружаем карту из файла и построить модель игры
+#ifndef DEBUG
         model::Game game = json_loader::LoadGame(argv[1]);
-        //model::Game game = json_loader::LoadGame("data/config.json");                      //для дебага
-
+#else
+        model::Game game = json_loader::LoadGame("data/config.json");                      //для дебага
+#endif
         // 2. Устанавливаем путь до статического контента.
+#ifndef DEBUG
         std::filesystem::path staticContentPath{ argv[2] };
-        //std::filesystem::path staticContentPath{"static"};                                //для дебага
-
+#else
+        std::filesystem::path staticContentPath{"static"};                                //для дебага
+#endif
         // 3. Инициализируем io_context
         const unsigned num_threads = std::thread::hardware_concurrency();
         net::io_context ioc(num_threads);
@@ -75,7 +81,7 @@ int main(int argc, const char* argv[]) {
             });
 
         // Эта надпись сообщает тестам о том, что сервер запущен и готов обрабатывать запросы
-        BOOST_LOG_TRIVIAL(info) << logger::CreateLogMessage("Server has started..."sv,
+        BOOST_LOG_TRIVIAL(info) << logger::CreateLogMessage("server started"sv,
             logger::ServerAddrPortLog(address.to_string(), port));
 
         // 7. Запускаем обработку асинхронных операций
