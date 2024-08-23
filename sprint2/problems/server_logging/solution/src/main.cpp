@@ -1,15 +1,19 @@
-#include "sdk.h"
+#include "other/sdk.h"
 
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/signal_set.hpp>
+#include <filesystem>
 #include <iostream>
 #include <thread>
 
-#include "json_loader.h"
-#include "request_handler.h"
+#include "json/json_loader.h"
+#include "request/request_handler.h"
+#include "logger/logger.h"
+#define BOOST_USE_WINAPI_VERSION 0x0501
 
 using namespace std::literals;
 namespace net = boost::asio;
+
 namespace sys = boost::system;
 
 namespace {
@@ -30,49 +34,58 @@ namespace {
 }  // namespace
 
 int main(int argc, const char* argv[]) {
-    if (argc != 2) {
-        std::cerr << "Usage: game_server <game-config-json>"sv << std::endl;
-        return EXIT_FAILURE;
-    }
+
+    logger::InitLogger();
+    //if (argc != 3) {
+    //    BOOST_LOG_TRIVIAL(error) << logger::CreateLogMessage("Usage: game_server <game-config-json>"sv,
+    //        logger::ExitCodeLog(EXIT_FAILURE));
+    //    return EXIT_FAILURE;
+    //}
     try {
         // 1. Загружаем карту из файла и построить модель игры
         model::Game game = json_loader::LoadGame(argv[1]);
+        //model::Game game = json_loader::LoadGame("data/config.json");                      //для дебага
 
-        // 2. Инициализируем io_context
+        // 2. Устанавливаем путь до статического контента.
+        std::filesystem::path staticContentPath{ argv[2] };
+        //std::filesystem::path staticContentPath{"static"};                                //для дебага
+
+        // 3. Инициализируем io_context
         const unsigned num_threads = std::thread::hardware_concurrency();
         net::io_context ioc(num_threads);
 
-        // 3. Добавляем асинхронный обработчик сигналов SIGINT и SIGTERM
-        net::signal_set sigSignals(ioc, SIGINT, SIGTERM);
-        sigSignals.async_wait([&ioc](const sys::error_code& ec, [[maybe_unused]] int num) {
+        // 4. Добавляем асинхронный обработчик сигналов SIGINT и SIGTERM
+        net::signal_set signals(ioc, SIGINT, SIGTERM);
+        signals.async_wait([&ioc](const sys::error_code& ec, [[maybe_unused]] int signal_number) {
             if (!ec) {
+                BOOST_LOG_TRIVIAL(info) << logger::CreateLogMessage("server was forcibly closed."sv,
+                    logger::ExitCodeLog(0));
                 ioc.stop();
-                std::cout << "Server has been finished by SIGINT or SIGTERM signal..."sv << std::endl;
             }
-            
             });
 
-        // 4. Создаём обработчик HTTP-запросов и связываем его с моделью игры
-        http_handler::RequestHandler handler{ game };
+        // 5. Создаём обработчик HTTP-запросов и связываем его с моделью игры, задаем путь до статического контента.
+        http_handler::RequestHandler handler{ game, staticContentPath };
 
-
-        // 5. Запустить обработчик HTTP-запросов, делегируя их обработчику запросов
+        // 6. Запустить обработчик HTTP-запросов, делегируя их обработчику запросов
         const auto address = net::ip::make_address("0.0.0.0");
         constexpr net::ip::port_type port = 8080;
         http_server::ServeHttp(ioc, { address, port }, [&handler](auto&& req, auto&& send) {
             handler(std::forward<decltype(req)>(req), std::forward<decltype(send)>(send));
-        });
+            });
 
         // Эта надпись сообщает тестам о том, что сервер запущен и готов обрабатывать запросы
-        std::cout << "Server has started..."sv << std::endl;
+        BOOST_LOG_TRIVIAL(info) << logger::CreateLogMessage("Server has started..."sv,
+            logger::ServerAddrPortLog(address.to_string(), port));
 
-        // 6. Запускаем обработку асинхронных операций
+        // 7. Запускаем обработку асинхронных операций
         RunWorkers(std::max(1u, num_threads), [&ioc] {
             ioc.run();
-        });
+            });
     }
     catch (const std::exception& ex) {
-        std::cerr << ex.what() << std::endl;
+        BOOST_LOG_TRIVIAL(error) << logger::CreateLogMessage("error"sv,
+            logger::ExceptionLog(EXIT_FAILURE, "Server not started"sv, ex.what()));
         return EXIT_FAILURE;
     }
 }
