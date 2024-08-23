@@ -83,7 +83,7 @@ namespace requestHandler {
     };
 
     template <typename Request, typename Send>
-    StringResponse LeaveStaticContentRootDir(const Request& req, const std::filesystem::path& staticContentPath, Send&& send) {
+    void LeaveStaticContentRootDir(const Request& req, const std::filesystem::path& staticContentPath, Send&& send) {
         StringResponse response(http::status::bad_request, req.version());
         response.set(http::field::content_type, "text/plain");
         response.body() = "Leave static content root directory.";
@@ -99,7 +99,7 @@ namespace requestHandler {
     };
 
     template <typename Request, typename Send>
-    http::response<http::file_body> GetStaticContentFile(const Request& req, const std::filesystem::path& staticContentPath, Send&& send) {
+    void GetStaticContentFile(const Request& req, const std::filesystem::path& staticContentPath, Send&& send) {
         http::response<http::file_body> tmpRes;
         tmpRes.version(11);                            // это версия хттп 1.1
         tmpRes.result(http::status::ok);

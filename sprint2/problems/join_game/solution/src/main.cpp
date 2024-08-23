@@ -38,11 +38,11 @@ namespace {
 int main(int argc, const char* argv[]) {
 
     logger::InitLogger();
-    if (argc != 3) {
-        BOOST_LOG_TRIVIAL(error) << logger::CreateLogMessage("Usage: game_server <game-config-json>"sv,
-            logger::ExitCodeLog(EXIT_FAILURE));
-        return EXIT_FAILURE;
-    }
+    //if (argc != 3) {
+    //    BOOST_LOG_TRIVIAL(error) << logger::CreateLogMessage("Usage: game_server <game-config-json>"sv,
+    //        logger::ExitCodeLog(EXIT_FAILURE));
+    //    return EXIT_FAILURE;
+    //}
     try {
         // 1. Загружаем карту из файла и построить модель игры
 #ifndef DEBUG

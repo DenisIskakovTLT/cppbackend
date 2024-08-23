@@ -19,8 +19,8 @@ namespace requestHandler {
         StaticFileRequestHandlerProxy(StaticFileRequestHandlerProxy&&) = delete;
         StaticFileRequestHandlerProxy& operator=(StaticFileRequestHandlerProxy&&) = delete;
 
-        
-        static StaticFileRequestHandlerProxy& GetInstance() {               //Ссыль на объект
+
+        static StaticFileRequestHandlerProxy& GetInstance() {                                               //Ссыль на объект
             static StaticFileRequestHandlerProxy obj;
             return obj;
         };
@@ -37,15 +37,15 @@ namespace requestHandler {
 
     private:
         std::vector< RHUnit<ActivatorType, HandlerType> > requests_ = {
-            //RHUnit<ActivatorType, HandlerType>(StaticContentFileNotFoundCheck,
-            //                                                {{http::verb::get, StaticContentFileNotFound}},
-            //                                                StaticContentFileNotFound),
-            //RHUnit<ActivatorType, HandlerType>(LeaveStaticContentRootDirCheck,
-            //                                                {{http::verb::get, LeaveStaticContentRootDir}},
-            //                                                LeaveStaticContentRootDir),
-            //RHUnit<ActivatorType, HandlerType>(GetStaticContentFileCheck,
-            //                                                {{http::verb::get, GetStaticContentFile}},
-            //                                                GetStaticContentFile)
+            RHUnit<ActivatorType, HandlerType>(StaticContentFileNotFoundCheck,
+                                                            {{http::verb::get, StaticContentFileNotFound}},
+                                                            StaticContentFileNotFound),
+            RHUnit<ActivatorType, HandlerType>(LeaveStaticContentRootDirCheck,
+                                                            {{http::verb::get, LeaveStaticContentRootDir}},
+                                                            LeaveStaticContentRootDir),
+            RHUnit<ActivatorType, HandlerType>(GetStaticContentFileCheck,
+                                                            {{http::verb::get, GetStaticContentFile}},
+                                                            GetStaticContentFile)
         };
 
         StaticFileRequestHandlerProxy() = default;
