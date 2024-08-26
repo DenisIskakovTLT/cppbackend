@@ -91,7 +91,7 @@ namespace jsonOperation {
 
     std::string JoinToGame(const std::string& token, size_t player_id) {
         boost::json::value msg = { {RESPONSE_AUTHTOKEN, token},
-                            {RESPONSE_AUTHTOKEN, player_id} };
+                            {RESPONSE_PLAYERID, player_id} };
         return boost::json::serialize(msg);
     };
 
