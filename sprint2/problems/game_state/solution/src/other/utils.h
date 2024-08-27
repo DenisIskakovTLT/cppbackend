@@ -10,7 +10,7 @@ namespace requestHandler {
 
 }//namespace requestHandler
 
-namespace random {
+namespace randomgen {
 
 	double RandomDouble(const double thl, const double thh);
 	int RandomInt(const int thl, const int thh);

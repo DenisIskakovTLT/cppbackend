@@ -55,7 +55,7 @@ namespace requestHandler {
 
 }//namespace requestHandler 
 
-namespace random {
+namespace randomgen {
 
     double RandomDouble(const double thl, const double thh) {
         std::random_device rd;

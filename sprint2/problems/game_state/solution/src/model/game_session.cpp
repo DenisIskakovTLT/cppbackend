@@ -24,15 +24,15 @@ namespace model {
     void GameSession::PutDogInRndPosition(std::shared_ptr<Dog> dog) {
         double x, y;
         auto roads = map_->GetRoads();
-        int road_index = random::RandomInt(0, roads.size() - 1);
+        int road_index = randomgen::RandomInt(0, roads.size() - 1);
         auto road = roads[road_index];
         if (road.IsHorizontal()) {
-            x = random::RandomDouble(road.GetStart().x,
+            x = randomgen::RandomDouble(road.GetStart().x,
                 road.GetEnd().x);
             y = road.GetStart().y;
         }
         else {
-            y = random::RandomDouble(road.GetStart().y,
+            y = randomgen::RandomDouble(road.GetStart().y,
                 road.GetEnd().y);
             x = road.GetStart().x;
         }
