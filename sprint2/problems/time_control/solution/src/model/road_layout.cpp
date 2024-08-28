@@ -159,12 +159,12 @@ namespace model {
 		return std::nullopt;
 	};
 
-	std::optional<const RoadLayout::MapCoord> RoadLayout::GetCoordinatesOfPosition(const Position& position) {
-		if (position.x < - OFFSET - ACCURACY || position.y < - OFFSET - ACCURACY) {
+	std::optional<const RoadLayout::MapCoord> RoadLayout::GetCoordinatesOfPosition(const Position& pos) {
+		if (pos.x < - OFFSET - ACCURACY || pos.y < - OFFSET - ACCURACY) {
 			return std::nullopt;
 		}
-		int64_t x_index = (position.x >= 0) ? std::floor(position.x * CELL_FACTOR) : std::ceil(position.x * CELL_FACTOR);
-		int64_t y_index = (position.y >= 0) ? std::floor(position.y * CELL_FACTOR) : std::ceil(position.y * CELL_FACTOR);
+		int64_t x_index = (pos.x >= 0) ? std::floor(pos.x * CELL_FACTOR) : std::ceil(pos.x * CELL_FACTOR);
+		int64_t y_index = (pos.y >= 0) ? std::floor(pos.y * CELL_FACTOR) : std::ceil(pos.y * CELL_FACTOR);
 		if (matrixMap_.contains(x_index)) {
 			if (matrixMap_[x_index].contains(y_index)) {
 				return MapCoord{ x_index, y_index };
@@ -182,9 +182,9 @@ namespace model {
 		return false;
 	};
 
-	bool RoadLayout::IsValidCoordinates(const MapCoord& coordinates) {
-		if (matrixMap_.contains(coordinates.x)) {
-			return matrixMap_[coordinates.x].contains(coordinates.y);
+	bool RoadLayout::IsValidCoordinates(const MapCoord& coord) {
+		if (matrixMap_.contains(coord.x)) {
+			return matrixMap_[coord.x].contains(coord.y);
 		}
 		return false;
 	};

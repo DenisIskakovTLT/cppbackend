@@ -17,7 +17,7 @@ namespace model {
     std::shared_ptr<Dog> GameSession::CreateDog(const std::string& dog_name) {
         auto dog = std::make_shared<Dog>(dog_name);
         dogs_.push_back(dog);
-        PutDogInRndPosition(dog);
+        //PutDogInRndPosition(dog);
         return dog;
     };
 

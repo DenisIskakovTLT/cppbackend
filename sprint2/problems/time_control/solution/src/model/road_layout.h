@@ -24,9 +24,9 @@ namespace model {
 		RoadLayout& operator = (RoadLayout&& other);
 		virtual ~RoadLayout() = default;
 
-		void AddRoad(const Road& road);								//добавить дорогу
+		void AddRoad(const Road& road);											//добавить дорогу
 
-		const Roads& GetRoads() const noexcept;								//Геттер
+		const Roads& GetRoads() const noexcept;									//Геттер
 
 
 		std::tuple<Position, Speed> GetValidMove(const Position& current_pos,	//Сам ход
