@@ -136,6 +136,7 @@ namespace requestHandler {
         else {
             tmpRes.body() = std::move(file);
         }
+        tmpRes.insert(http::field::cache_control, "no-cache");
         tmpRes.prepare_payload();              //Заполнит заголовки Content-Length и Transfer-Encoding
         send(tmpRes);
     };

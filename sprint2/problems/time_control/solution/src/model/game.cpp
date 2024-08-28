@@ -13,6 +13,10 @@ namespace model {
         }
         else {
             try {
+                if (initDogSpeed_ != DOG_SPEED_INIT &&
+                    map.GetDogSpeed() == DOG_SPEED_INIT) {
+                    map.SetDogSpeed(initDogSpeed_);
+                }
                 maps_.push_back(std::make_shared<Map>(std::move(map)));
             }
             catch (...) {

@@ -65,6 +65,7 @@ namespace requestHandler {
         Send&& send) {
         StringResponse response(http::status::ok, req.version());
         response.set(http::field::content_type, "application/json");
+        response.set(http::field::cache_control, "no-cache");
         response.body() = jsonOperation::GameToJson(application.ListMap());
         response.content_length(response.body().size());
         response.keep_alive(req.keep_alive());
@@ -93,6 +94,7 @@ namespace requestHandler {
         }
         http::response<http::string_body> response(http::status::ok, req.version());
         response.set(http::field::content_type, "application/json");
+        response.set(http::field::cache_control, "no-cache");
         response.body() = jsonOperation::MapToJson(*application.FindMap(model::Map::Id(std::string(id))));
         response.content_length(response.body().size());
         response.keep_alive(req.keep_alive());
