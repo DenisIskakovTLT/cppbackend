@@ -32,12 +32,12 @@ namespace model {
 
     void Player::MoveDog(const std::chrono::milliseconds& diff_time) {
         auto dog = dog_.lock();
-        auto [new_position, new_velocity] = session_.lock()->GetMap()->GetMove(
+        auto [new_pos, new_speed] = session_.lock()->GetMap()->GetMove(
             dog->GetPosition(),
             dog->CalculateNewPosition(diff_time),
             dog->GetSpeed());
-        dog->SetPosition(new_position);
-        dog->SetSpeed(new_velocity);
+        dog->SetPosition(new_pos);
+        dog->SetSpeed(new_speed);
     };
 
 }

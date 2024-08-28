@@ -77,6 +77,11 @@ namespace model {
         map.AddBuildings(buildings);
         std::vector<Office> offices = json::value_to<std::vector<Office>>(jv.as_object().at(OFFICES));
         map.AddOffices(offices);
+        try {
+            double dog_speed = json::value_to<double>(jv.as_object().at(MAP_DOG_SPEED));
+            map.SetDogSpeed(dog_speed);
+        }
+        catch (...) {}
         return map;
     };
 
