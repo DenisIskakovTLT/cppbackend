@@ -8,7 +8,7 @@ namespace model {
 	const std::string MAPS = "maps";
 	const std::string MAP_ID = "id";
 	const std::string MAP_NAME = "name";
-	const std::string MAP_DOG_VELOCITY = "dogSpeed";
+	const std::string MAP_DOG_SPEED = "dogSpeed";
 
 	const std::string ROADS = "roads";
 	const std::string ROAD_XO = "x0";
@@ -28,5 +28,7 @@ namespace model {
 	const std::string OFFICE_Y = "y";
 	const std::string OFFICE_OFFSET_X = "offsetX";
 	const std::string OFFICE_OFFSET_Y = "offsetY";
+
+	const double CONVERT_MS_TO_S = 1000.0;
 
 }

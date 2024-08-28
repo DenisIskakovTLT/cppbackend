@@ -78,7 +78,7 @@ namespace model {
 	std::tuple<Position, Speed> RoadLayout::GetValidMove(const Position& current_pos,
 		const Position& target_pos,
 		const Speed& current_spd) {
-		Speed velocity = { 0, 0 };
+		Speed speed = { 0, 0 };
 		auto start_roads = GetCoordinatesOfPosition(current_pos);
 		auto end_roads = GetCoordinatesOfPosition(target_pos);
 		if (end_roads) {
@@ -94,12 +94,12 @@ namespace model {
 		Position position;
 		if (dest && IsValidPosition(matrixMap_[dest.value().x][dest.value().y], target_pos)) {
 			position = target_pos;
-			velocity = current_spd;
+			speed = current_spd;
 		}
 		else {
 			position = GetFarthestPoinOfRoute(dest.value(), current_pos, current_spd);
 		}
-		return std::tie(position, velocity);
+		return std::tie(position, speed);
 	};
 
 	std::optional<const RoadLayout::MapCoord> RoadLayout::GetDestinationRoadsOfRoute(

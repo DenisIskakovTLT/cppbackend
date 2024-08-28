@@ -29,7 +29,7 @@ namespace model {
 		const Roads& GetRoads() const noexcept;								//Геттер
 
 
-		std::tuple<Position, Speed> GetValidMove(const Position& current_pos,	//
+		std::tuple<Position, Speed> GetValidMove(const Position& current_pos,	//Сам ход
 			const Position& target_pos,
 			const Speed& current_spd);
 

@@ -45,7 +45,7 @@ namespace model {
 
     struct SpeedHasher {
         size_t operator()(const Speed& spd) const {
-            size_t sd = 666;
+            size_t sd = 17;
             return std::hash<double>{}(spd.vy)* sd + std::hash<double>{}(spd.vx);
         }
     };

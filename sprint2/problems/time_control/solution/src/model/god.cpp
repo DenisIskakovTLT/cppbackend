@@ -1,4 +1,5 @@
 #include "../model/god.h"
+#include "../model/constdef.h"
 
 namespace model {
 
@@ -66,8 +67,8 @@ namespace model {
     Position Dog::CalculateNewPosition(const std::chrono::milliseconds& diff_time) {
         Position pos = GetPosition();
         const Speed& speed = GetSpeed();
-        pos.x += speed.vx * diff_time.count() / 1000;          //1000 - перевод из мс в с
-        pos.y += speed.vy * diff_time.count() / 1000;
+        pos.x += speed.vx * diff_time.count() / CONVERT_MS_TO_S;          //1000 - перевод из мс в с
+        pos.y += speed.vy * diff_time.count() / CONVERT_MS_TO_S;
         return pos;
     };
 
