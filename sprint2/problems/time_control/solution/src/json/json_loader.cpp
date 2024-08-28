@@ -36,6 +36,11 @@ namespace json_loader {
         boost::json::value jsonVal = ReadJSONFile(json_path);
         std::vector<model::Map> maps = boost::json::value_to< std::vector<model::Map> >(jsonVal.as_object().at(model::MAPS));
         game.AddMaps(maps);
+        try {
+            double dog_speed = boost::json::value_to<double>(jsonVal.as_object().at(model::DEFAULT_DOG_SPEED));
+            game.SetInitDogSpeed(dog_speed);
+        }
+        catch (...) {}
         return game;
     };
 

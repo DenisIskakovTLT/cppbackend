@@ -3,7 +3,7 @@
 
 namespace model {
 
-	const std::string DEFAULT_DOG_VELOCITY = "defaultDogSpeed";
+	const std::string DEFAULT_DOG_SPEED = "defaultDogSpeed";
 
 	const std::string MAPS = "maps";
 	const std::string MAP_ID = "id";

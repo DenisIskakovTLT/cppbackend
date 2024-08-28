@@ -62,8 +62,8 @@ namespace model {
         return nullptr;
     };
 
-    void Game::SetInitDogSpeed(double velocity) {
-        initDogSpeed_ = std::abs(velocity);
+    void Game::SetInitDogSpeed(double speed) {
+        initDogSpeed_ = std::abs(speed);
         if (initDogSpeed_ == DOG_SPEED_INIT) {
             return;
         }
