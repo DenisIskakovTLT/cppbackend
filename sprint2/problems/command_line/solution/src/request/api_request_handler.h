@@ -492,7 +492,7 @@ namespace requestHandler {
         StringResponse response(application.CheckTimeManage() ? http::status::method_not_allowed : http::status::bad_request, req.version());
         response.set(http::field::content_type, "application/json");
         response.set(http::field::cache_control, "no-cache");
-        response.body() = jsonOperation::InvalidEndpoint();
+        response.body() = application.CheckTimeManage() ? jsonOperation::InvalidMethod() : jsonOperation::InvalidEndpoint();
         response.content_length(response.body().size());
         response.keep_alive(req.keep_alive());
         send(response);
