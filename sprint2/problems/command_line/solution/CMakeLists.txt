@@ -7,7 +7,7 @@ include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
 find_package(Boost 1.78.0 REQUIRED)
-find_package(Boost 1.78.0 COMPONENTS log log_setup)
+find_package(Boost 1.78.0 COMPONENTS log log_setup program_options)
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
 endif()
