@@ -34,7 +34,7 @@ namespace jsonOperation {
 	std::string JoinToGameInvalidArgument();															//Передали кривые аргументы
 	std::string JoinToGameMapNotFound();																//При заходе в игру не нашли карту
 	std::string JoinToGameEmptyPlayerName();															//Задали пустое имя
-	std::string PlayersListOnMap(const std::vector< std::weak_ptr<app::Player> >& players);			//Выдать списко игорьков
+	std::string PlayersListOnMap(const std::vector< std::weak_ptr<app::Player> >& players);				//Выдать списко игорьков
 	std::string InvalidMethod();																		//Выдать invalid method
 	std::string EmptyAuthorization();																	//Выдать, что никто не авторихвоан при запросе списка игорьков
 	std::string UnknownToken();																			//Выдать, что кривой токен при запросе списка игорьков

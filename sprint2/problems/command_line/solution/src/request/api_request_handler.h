@@ -484,7 +484,7 @@ namespace requestHandler {
         const Request& req,
         app::Application& application,
         Send&& send) {
-        StringResponse response(http::status::bad_request, req.version());
+        StringResponse response(http::status::method_not_allowed, req.version());
         response.set(http::field::content_type, "application/json");
         response.set(http::field::cache_control, "no-cache");
         response.body() = jsonOperation::InvalidEndpoint();
