@@ -12,7 +12,7 @@ namespace requestHandler {
     template<typename Request, typename Send>
     class ApiRequestHandlerProxy {
         using ActivatorType = bool(*)(const Request&);
-        using HandlerType = std::optional<size_t>(*)(const Request&, app::Application&, Send&);
+        using HandlerType = std::optional<size_t>(*)(const Request&, app::Application&, Send&&);
     public:
 
         /*Всё копирование запрещено*/
@@ -27,15 +27,13 @@ namespace requestHandler {
             return obj;
         };
 
-        bool Execute(const Request& req, app::Application& application, Send&& send) {                  //Сам исполнитель
+        bool Execute(const Request& req, app::Application& application, Send&& send) {
             for (auto item : requests_) {
                 if (item.GetActivator()(req)) {
-                    net::dispatch(*application.GetStrand(), [&item, &req, &application, &send] {
-                        auto res = item.GetHandler(req.method())(req, application, send);
-                        while (res.has_value()) {                                                       //Возможно плохо, т.к. блокирующий режим
-                            res = item.GetAddHandlerByIndex(res.value())(req, application, send);
-                        }
-                        });
+                    auto res = item.GetHandler(req.method())(req, application, std::forward<Send>(send));
+                    while (res.has_value()) {
+                        res = item.GetAddHandlerByIndex(res.value())(req, application, std::forward<Send>(send));
+                    }
                     return true;
                 }
             }

@@ -42,7 +42,8 @@ int main(int argc, const char* argv[]) {
 #ifndef DEBUG
     programm_option::Args args = programm_option::ParseCommandLine(argc, argv);
 #else
-    programm_option::Args args;
+    programm_option::Args args ;
+    //args.tick_period = 20;
 #endif
     try {
         // 1. Загружаем карту из файла и построить модель игры
