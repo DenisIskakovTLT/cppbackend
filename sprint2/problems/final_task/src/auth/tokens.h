@@ -1,6 +1,6 @@
 #pragma once
-#include "../other/tagged.h"
-#include "../application/player.h"
+#include "tagged.h"
+#include "player.h"
 
 
 #include <random>

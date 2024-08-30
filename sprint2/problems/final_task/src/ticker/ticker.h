@@ -3,7 +3,7 @@
 #include <memory>
 #include <chrono>
 #include <functional>
-#include "../error/error_handler.h"
+#include "error_handler.h"
 #include <boost/asio/strand.hpp>
 #include <boost/asio.hpp>
 

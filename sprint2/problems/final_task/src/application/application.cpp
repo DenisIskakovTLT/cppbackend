@@ -1,5 +1,5 @@
-#include "../application/application.h"
-#include "../model/dog.h"
+#include "application.h"
+#include "dog.h"
 
 #include <iostream>
 
@@ -75,7 +75,7 @@ namespace app {
         dog->Move(direction, speed);
     };
 
-    bool Application::CheckTimeManage() {
+    bool Application::CheckTimeManage() const{
         return tickPeriod_.count() == 0;
     };
 

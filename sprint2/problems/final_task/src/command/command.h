@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <string>
 
 namespace programm_option {
@@ -11,7 +12,7 @@ namespace programm_option {
         bool randomize_spawn_points{ false };
     };
 
-    [[nodiscard]] Args ParseCommandLine(int argc, const char* const argv[]);        //Парсинг командной строки
+    [[nodiscard]] std::optional<Args> ParseCommandLine(int argc, const char* const argv[]);        //Парсинг командной строки
 
     class ConfigFileNotSpecifiedException : public std::exception {
     public:

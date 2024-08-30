@@ -1,4 +1,4 @@
-#include "other/sdk.h"
+#include "sdk.h"
 
 #include <boost/asio/io_context.hpp>
 #include <iostream>
@@ -6,14 +6,14 @@
 #include <boost/asio/signal_set.hpp>
 #include <filesystem>
 
-#include "json/json_loader.h"
-#include "request/request_handler.h"
-#include "logger/logger.h"
-#include "application/application.h"  
-#include "command/command.h"    
+#include "json_loader.h"
+#include "request_handler.h"
+#include "logger.h"
+#include "application.h"  
+#include "command.h"    
 
 #define BOOST_USE_WINAPI_VERSION 0x0501
-//#define DEBUG
+#define DEBUG
 
 using namespace std::literals;
 namespace net = boost::asio;
@@ -40,28 +40,29 @@ int main(int argc, const char* argv[]) {
 
     logger::InitLogger();
 #ifndef DEBUG
-    programm_option::Args args = programm_option::ParseCommandLine(argc, argv);
+    std::optional<programm_option::Args> args = programm_option::ParseCommandLine(argc, argv);
 #else
-    programm_option::Args args ;
-    args.tick_period = 20;
+    std::optional<programm_option::Args> args;
+    args.emplace().tick_period = 20;
+    args.emplace().randomize_spawn_points = 0;
 #endif
     try {
         // 1. Загружаем карту из файла и построить модель игры
 #ifndef DEBUG
-        model::Game game = json_loader::LoadGame(args.config_file);
+        model::Game game = json_loader::LoadGame(args.value().config_file);
 #else
         model::Game game = json_loader::LoadGame("data/config.json");                       //для дебага
 #endif
         // 2. Устанавливаем путь до статического контента.
 #ifndef DEBUG
-        std::filesystem::path staticContentPath{ args.www_root };
+        std::filesystem::path staticContentPath{ args.value().www_root };
 #else
         std::filesystem::path staticContentPath{"static"};                                //для дебага
 #endif
         // 3. Инициализируем io_context
         const unsigned num_threads = std::thread::hardware_concurrency();
         net::io_context ioc(num_threads);
-        app::Application application(std::move(game), args.tick_period, args.randomize_spawn_points, ioc);
+        app::Application application(std::move(game), args.value().tick_period, args.value().randomize_spawn_points, ioc);
 
         // 4. Добавляем асинхронный обработчик сигналов SIGINT и SIGTERM
         net::signal_set signals(ioc, SIGINT, SIGTERM);

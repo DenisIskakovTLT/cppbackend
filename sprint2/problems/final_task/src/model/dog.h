@@ -1,6 +1,6 @@
 #pragma once
-#include "../other/tagged.h"
-#include "../model/typedef.h"
+#include "tagged.h"
+#include "typedef.h"
 
 #include <chrono>
 #include <string>

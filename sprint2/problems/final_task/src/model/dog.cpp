@@ -1,5 +1,5 @@
-#include "../model/dog.h"
-#include "../model/constdef.h"
+#include "dog.h"
+#include "constdef.h"
 
 namespace model {
 

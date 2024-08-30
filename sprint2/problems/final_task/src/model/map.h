@@ -1,9 +1,9 @@
 #pragma once
-#include "../other/tagged.h"
-#include "../model/dog.h"
-#include "../model/road_layout.h"
-#include "../model/typedef.h"
-#include "../model/constdef.h"
+#include "tagged.h"
+#include "dog.h"
+#include "road_layout.h"
+#include "typedef.h"
+#include "constdef.h"
 
 #include <string>
 #include <unordered_map>

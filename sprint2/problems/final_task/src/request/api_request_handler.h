@@ -1,8 +1,8 @@
 #pragma once
-#include "../application/application.h"
-#include "../auth/tokens.h"
-#include "../json/json_handler.h"
-#include "../other/utils.h"
+#include "application.h"
+#include "tokens.h"
+#include "json_handler.h"
+#include "utils.h"
 
 #include <vector>
 #include <boost/beast/http.hpp>

@@ -1,4 +1,4 @@
-#include "../application/player.h"
+#include "player.h"
 
 namespace app {
 

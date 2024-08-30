@@ -1,4 +1,4 @@
-#include "../model/road_layout.h"
+#include "road_layout.h"
 
 #include <cmath>
 #include <iostream>

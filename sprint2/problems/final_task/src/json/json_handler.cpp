@@ -1,5 +1,5 @@
 #include "json_handler.h"
-#include "../model/map.h"
+#include "map.h"
 #include <map>
 #include <sstream>
 #include <boost/json/array.hpp>

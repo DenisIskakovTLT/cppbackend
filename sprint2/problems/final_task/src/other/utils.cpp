@@ -1,4 +1,4 @@
-#include "../other/utils.h"
+#include "utils.h"
 #include <string>
 
 namespace requestHandler {
@@ -34,7 +34,7 @@ namespace requestHandler {
         std::string token;
         std::vector<std::string_view> splitted;
         std::string delim = " ";
-        if (bearer_string.empty() or bearer_string == delim) {
+        if (bearer_string.empty() || bearer_string == delim) {
             return token;
         }
         auto start = 0U;

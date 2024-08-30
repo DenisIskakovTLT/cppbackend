@@ -1,4 +1,4 @@
-#include "../application/game_session.h"
+#include "game_session.h"
 
 namespace app {
 

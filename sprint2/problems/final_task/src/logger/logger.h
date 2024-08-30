@@ -3,7 +3,7 @@
 #include <boost/log/core.hpp>        
 #include <boost/log/utility/setup/console.hpp>
 
-#include "../logger/logging_handler.h"
+#include "logging_handler.h"
 
 namespace logger {
 

@@ -1,5 +1,5 @@
-#include "../command/command.h"
-#include "../logger/logger.h"
+#include "command.h"
+#include "logger.h"
 
 #include <boost/program_options.hpp>
 
@@ -7,7 +7,7 @@ namespace programm_option {
 
     using namespace std::literals;
 
-    [[nodiscard]] Args ParseCommandLine(int argc, const char* const argv[]) {
+    [[nodiscard]] std::optional<Args> ParseCommandLine(int argc, const char* const argv[]) {
         namespace po = boost::program_options;
 
         po::options_description desc{ "All options"s };
@@ -24,7 +24,7 @@ namespace programm_option {
 
         if (vm.contains("help"s)) {
             std::cout << desc;
-            std::exit(0);
+            return std::nullopt;
         }
 
         if (!vm.contains("config-file"s)) {

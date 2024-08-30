@@ -1,4 +1,4 @@
-#include "../ticker/ticker.h"
+#include "ticker.h"
 
 
 namespace tickerTime {

@@ -1,6 +1,6 @@
 #pragma once
-#include "../model/road.h"
-#include "../model/typedef.h"
+#include "road.h"
+#include "typedef.h"
 
 #include <map>
 #include <optional>

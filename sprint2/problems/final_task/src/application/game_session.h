@@ -1,8 +1,8 @@
 #pragma once
-#include "../model/map.h"
-#include "../model/dog.h"
-#include "../other/tagged.h"
-#include "../other/utils.h"
+#include "map.h"
+#include "dog.h"
+#include "tagged.h"
+#include "utils.h"
 
 #include <vector>
 #include <memory>

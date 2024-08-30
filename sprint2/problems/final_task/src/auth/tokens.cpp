@@ -1,4 +1,4 @@
-#include "../auth/tokens.h"
+#include "tokens.h"
 
 #include <iomanip>
 #include <sstream>

@@ -1,5 +1,5 @@
-#include "../json/json_loader.h"
-#include "../logger/logger.h"
+#include "json_loader.h"
+#include "logger.h"
 
 #include <fstream>
 #include <iostream>

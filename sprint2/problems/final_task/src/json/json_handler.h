@@ -1,5 +1,5 @@
 #pragma once
-#include "../application/application.h"
+#include "application.h"
 #include <string>
 #include <tuple>
 #include <optional>

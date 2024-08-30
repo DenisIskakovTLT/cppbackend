@@ -1,8 +1,8 @@
 #pragma once
-#include "../server/http_server.h"
-#include "../application/application.h"
-#include "../request/static_file_request_handler_proxy.h"
-#include "../request/api_request_handler_proxy.h"
+#include "http_server.h"
+#include "application.h"
+#include "static_file_request_handler_proxy.h"
+#include "api_request_handler_proxy.h"
 
 #include <filesystem>
 

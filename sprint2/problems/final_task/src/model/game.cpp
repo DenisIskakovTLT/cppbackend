@@ -1,4 +1,4 @@
-#include "../model/game.h"
+#include "game.h"
 
 #include <string>
 

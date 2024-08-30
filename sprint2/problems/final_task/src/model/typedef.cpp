@@ -1,4 +1,4 @@
-#include "../model/typedef.h"
+#include "typedef.h"
 
 namespace model {
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "../logger/logger.h"
+#include "logger.h"
 #include <string_view>
 
 namespace errorHandler {

@@ -1,4 +1,4 @@
-#include "../logger/logging_handler.h"
+#include "logging_handler.h"
 
 namespace logger {
 
