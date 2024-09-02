@@ -50,7 +50,7 @@ def make_shots():
 
 
 
-server = run(start_server())
+server = run(start_server(), subprocess.DEVNULL)
 perf_record = run(perf(server.pid))
 make_shots()
 perf_record.send_signal(signal.SIGINT)
@@ -62,6 +62,6 @@ with open("graph.svg", "w") as file:
     stackcollapse = subprocess.Popen(shlex.split("./FlameGraph/stackcollapse-perf.pl"), stdin=script.stdout, stdout=subprocess.PIPE)
     output = subprocess.Popen(shlex.split("./FlameGraph/flamegraph.pl"), stdin=stackcollapse.stdout, stdout=file)
     stop(script, True)
-	stop(stackcollapse, True)
-	stop(output, True)
+    stop(stackcollapse, True)
+    stop(output, True)
 print('Job done')
