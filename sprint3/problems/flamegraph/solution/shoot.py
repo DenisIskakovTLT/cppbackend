@@ -3,6 +3,7 @@ import subprocess
 import time
 import random
 import shlex
+import signal
 
 RANDOM_LIMIT = 1000
 SEED = 123456789
