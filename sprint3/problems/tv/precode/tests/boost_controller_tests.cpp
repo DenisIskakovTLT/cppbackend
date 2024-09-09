@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE(on_TurnOff_command_with_some_arguments_prints_error_message
     ExpectExtraArgumentsErrorInOutput("TurnOff"sv);
 }
 // Включите этот тест, после того, как реализуете метод TV::SelectChannel
-#if 0
+#if 1
 BOOST_AUTO_TEST_CASE(on_Info_prints_current_channel) {
     tv.SelectChannel(42);
     RunMenuCommand("Info"s);
