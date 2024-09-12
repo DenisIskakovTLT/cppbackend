@@ -42,6 +42,7 @@ target_include_directories(UserStaticLib PUBLIC
 	${ZLIB_INCLUDES}
 	src/ModelLayer/model
 	src/InterLayer/other
+	src/InterLayer/json
 )
 	
 add_executable(game_server
