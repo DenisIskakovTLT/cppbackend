@@ -34,7 +34,7 @@ namespace app {
             map_(map),
             strand_(std::make_shared<SessionStrand>(net::make_strand(ioc))),
             id_(*(map->GetId())),
-            lootGenerator_(TimeInterval(static_cast<uint64_t>(cfg.period * model::CONVERT_MS_TO_S)), cfg.probability)
+            lootGenerator_(TimeInterval(static_cast<uint64_t>(cfg.period)), cfg.probability)
        
         {
             lootTicker_ = std::make_shared<tickerTime::Ticker>(
