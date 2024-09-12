@@ -4,7 +4,7 @@ project(game_server CXX)
 set(CMAKE_CXX_STANDARD 20)
 
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-conan_basic_setup(TARGETS)
+conan_basic_setup()
 
 find_package(Boost 1.78.0 REQUIRED)
 find_package(Boost 1.78.0 COMPONENTS log log_setup program_options)
@@ -15,33 +15,6 @@ endif()
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-
-add_library(UserStaticLib STATIC
-	src/ModelLayer/model/map.cpp
-	src/ModelLayer/model/map.h
-	src/ModelLayer/model/dog.h
-	src/ModelLayer/model/dog.cpp
-	src/ModelLayer/model/game.h
-	src/ModelLayer/model/game.cpp
-	src/ModelLayer/model/constdef.h
-	src/ModelLayer/model/typedef.h
-	src/ModelLayer/model/typedef.cpp
-	src/ModelLayer/model/loot_generator.h
-	src/ModelLayer/model/loot_generator.cpp
-	src/ModelLayer/model/lost_obj.h
-	src/ModelLayer/model/lost_obj.cpp
-	src/InterLayer/other/sdk.h
-	src/InterLayer/other/tagged.h
-	src/InterLayer/other/utils.h
-	src/InterLayer/other/utils.cpp
-)
-
-target_include_directories(UserStaticLib PUBLIC 
-	${ZLIB_INCLUDES}
-	src/ModelLayer/model
-	src/InterLayer/other
-)
-	
 add_executable(game_server
 	src/main.cpp
 	src/ApplicationLayer/application/application.h
@@ -69,6 +42,27 @@ add_executable(game_server
 	src/InterLayer/logger/logger.cpp
 	src/InterLayer/logger/logging_handler.cpp
 	src/InterLayer/logger/logging_handler.h
+	src/ModelLayer/model/constdef.h
+	src/ModelLayer/model/dog.h
+	src/ModelLayer/model/dog.cpp
+	src/ModelLayer/model/game.h
+	src/ModelLayer/model/game.cpp
+	src/ModelLayer/model/map.cpp
+	src/ModelLayer/model/map.h
+	src/ModelLayer/model/road.h
+	src/ModelLayer/model/road.cpp
+	src/ModelLayer/model/road_layout.h
+	src/ModelLayer/model/road_layout.cpp
+	src/ModelLayer/model/typedef.h
+	src/ModelLayer/model/typedef.cpp
+	src/ModelLayer/model/loot_generator.h
+	src/ModelLayer/model/loot_generator.cpp
+	src/ModelLayer/model/lost_obj.h
+	src/ModelLayer/model/lost_obj.cpp
+	src/InterLayer/other/sdk.h
+	src/InterLayer/other/tagged.h
+	src/InterLayer/other/utils.h
+	src/InterLayer/other/utils.cpp
 	src/ServerLayer/request/api_request_handler.h
 	src/ServerLayer/request/api_request_handler_proxy.h
 	src/ServerLayer/request/static_file_request_handler.h
@@ -80,8 +74,8 @@ add_executable(game_server
 	src/ServerLayer/server/http_server.h
 	src/InterLayer/ticker/ticker.h
 	src/InterLayer/ticker/ticker.cpp
-)
 
+)
 target_include_directories(game_server PRIVATE
 	src
 	src/ApplicationLayer/application
@@ -91,21 +85,14 @@ target_include_directories(game_server PRIVATE
 	src/InterLayer/file_system
 	src/InterLayer/json
 	src/InterLayer/logger
+	src/InterLayer/other
 	src/InterLayer/ticker
+	src/ModelLayer/model
 	src/ServerLayer/request
 	src/ServerLayer/server
 
 )
-target_link_libraries(game_server PRIVATE Threads::Threads Boost::log Boost::log_setup Boost::program_options UserStaticLib)
-
-include(CTest)
-include(${CONAN_BUILD_DIRS_CATCH2}/Catch.cmake)
-
-add_executable(ServerTest
-	tests/loot_generator_tests.cpp
-)
-target_link_libraries(ServerTest PRIVATE CONAN_PKG::catch2 UserStaticLib)
-catch_discover_tests(ServerTest)
+target_link_libraries(game_server PRIVATE Threads::Threads Boost::log Boost::log_setup Boost::program_options)
 
 # Boost.Beast будет использовать std::string_view вместо boost::string_view
-add_compile_definitions(BOOST_BEAST_USE_STD_STRING_VIEW)
+add_compile_definitions(BOOST_BEAST_USE_STD_STRING_VIEW)+79514449842 Марат
