@@ -36,6 +36,8 @@ add_executable(game_server
 	src/InterLayer/json/json_handler.h
 	src/InterLayer/json/json_handler.cpp
 	src/InterLayer/json/boost_json.cpp
+	src/InterLayer/json/tag_invoke_handler.cpp
+	src/InterLayer/json/tag_invoke_handler.h
 	src/InterLayer/logger/logger.h
 	src/InterLayer/logger/logger.cpp
 	src/InterLayer/logger/logging_handler.cpp
