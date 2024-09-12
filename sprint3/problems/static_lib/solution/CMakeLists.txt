@@ -104,6 +104,10 @@ include(${CONAN_BUILD_DIRS_CATCH2}/Catch.cmake)
 add_executable(ServerTest
 	tests/loot_generator_tests.cpp
 )
+
+target_include_directories(ServerTest PRIVATE
+	tests
+)
 target_link_libraries(ServerTest PRIVATE CONAN_PKG::catch2 UserStaticLib)
 catch_discover_tests(ServerTest)
 
