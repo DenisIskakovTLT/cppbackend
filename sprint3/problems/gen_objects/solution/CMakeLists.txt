@@ -78,10 +78,18 @@ add_executable(game_server
 )
 target_include_directories(game_server PRIVATE
 	src
-	src/ApplicationLayer
-	src/InterLayer
-	src/ModelLayer
-	src/ServerLayer
+	src/ApplicationLayer/application
+	src/ApplicationLayer/auth
+	src/InterLayer/command
+	src/InterLayer/error
+	src/InterLayer/file_system
+	src/InterLayer/json
+	src/InterLayer/logger
+	src/InterLayer/other
+	src/InterLayer/ticker
+	src/ModelLayer/model
+	src/ServerLayer/request
+	src/ServerLayer/server
 
 )
 target_link_libraries(game_server PRIVATE Threads::Threads Boost::log Boost::log_setup Boost::program_options)
