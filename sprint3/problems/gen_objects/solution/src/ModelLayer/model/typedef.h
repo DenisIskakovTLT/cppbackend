@@ -44,16 +44,17 @@ namespace model {
     struct LootGenCfg {
         double period, probability;
     };
-
+    //https://stackoverflow.com/questions/49730260/jsonconvert-how-to-ignore-integer-types-where-the-value-is-a-specific-number
+    //Иначе будет слать 0 в ротейшн, когда поле не определено конфигом
     struct LootType {
         std::string name{ "" };
         std::string file{ "" };
         std::string type{ "" };
-        int rotation{ INT_MIN };
+        int rotation{ -2147483648 };
         std::string color{ "" };
         double scale{ 0.0 };
     };
-
+    
     bool operator == (const Speed& lhs, const Speed& rhs);
 
     struct SpeedHasher {
