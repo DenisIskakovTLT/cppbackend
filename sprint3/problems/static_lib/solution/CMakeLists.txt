@@ -102,12 +102,12 @@ target_link_libraries(game_server PRIVATE Threads::Threads Boost::log Boost::log
 include(CTest)
 include(${CONAN_BUILD_DIRS_CATCH2}/Catch.cmake)
 
-add_executable(ServerTest
+add_executable(game_server_tests
 	tests/loot_generator_tests.cpp
 )
 
-target_link_libraries(ServerTest PUBLIC ${CATCH2_LIB} UserStaticLib)
-catch_discover_tests(ServerTest)
+target_link_libraries(game_server_tests PRIVATE CONAN_PKG::catch2 UserStaticLib)
+catch_discover_tests(game_server_tests)
 
 # Boost.Beast будет использовать std::string_view вместо boost::string_view
 add_compile_definitions(BOOST_BEAST_USE_STD_STRING_VIEW)
