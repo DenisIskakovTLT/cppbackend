@@ -105,10 +105,7 @@ add_executable(ServerTest
 	tests/loot_generator_tests.cpp
 )
 
-target_include_directories(ServerTest PRIVATE
-	tests
-)
-target_link_libraries(ServerTest PRIVATE CONAN_PKG::catch2 UserStaticLib)
+target_link_libraries(ServerTest PUBLIC ${CATCH2_LIB} UserStaticLib)
 catch_discover_tests(ServerTest)
 
 # Boost.Beast будет использовать std::string_view вместо boost::string_view
