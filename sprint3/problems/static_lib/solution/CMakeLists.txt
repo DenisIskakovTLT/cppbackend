@@ -17,13 +17,17 @@ find_package(Threads REQUIRED)
 
 
 add_library(UserStaticLib STATIC
-	src/ModelLayer/model/map.cpp
-	src/ModelLayer/model/map.h
+	src/ModelLayer/model/constdef.h
 	src/ModelLayer/model/dog.h
 	src/ModelLayer/model/dog.cpp
 	src/ModelLayer/model/game.h
 	src/ModelLayer/model/game.cpp
-	src/ModelLayer/model/constdef.h
+	src/ModelLayer/model/map.cpp
+	src/ModelLayer/model/map.h
+	src/ModelLayer/model/road.h
+	src/ModelLayer/model/road.cpp
+	src/ModelLayer/model/road_layout.h
+	src/ModelLayer/model/road_layout.cpp
 	src/ModelLayer/model/typedef.h
 	src/ModelLayer/model/typedef.cpp
 	src/ModelLayer/model/loot_generator.h
