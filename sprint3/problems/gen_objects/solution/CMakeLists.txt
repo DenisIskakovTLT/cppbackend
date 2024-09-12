@@ -95,4 +95,4 @@ target_include_directories(game_server PRIVATE
 target_link_libraries(game_server PRIVATE Threads::Threads Boost::log Boost::log_setup Boost::program_options)
 
 # Boost.Beast будет использовать std::string_view вместо boost::string_view
-add_compile_definitions(BOOST_BEAST_USE_STD_STRING_VIEW)+79514449842 Марат
+add_compile_definitions(BOOST_BEAST_USE_STD_STRING_VIEW)
