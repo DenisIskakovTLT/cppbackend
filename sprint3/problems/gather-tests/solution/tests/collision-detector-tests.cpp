@@ -127,6 +127,7 @@ TEST_CASE("Собиратель нашёл предмет двигаясь в с
 
 TEST_CASE("Собиратель нашёл несколько предметов двигаяь по Х", FIND_GATHER_EVENTS_TAG) {
     using Catch::Matchers::WithinAbs;
+    using Catch::Matchers::WithinRel;
     collision_detector::Item item1{ {5.0, 0.5}, 0.0 };                     //лут лежит на (5,0.5)
     collision_detector::Item item2{ {8.0, 0.5}, 0.0 };                     //лут лежит на (5,0.5)
     collision_detector::Gatherer gatherer{ {0, 0}, {10.0, 0.5}, 0.7 };    //Искатель идёт от (0,0) до (5,0.5)
@@ -141,19 +142,20 @@ TEST_CASE("Собиратель нашёл несколько предметов
     /*Первый лут*/
     CHECK(events[0].gatherer_id == 0);
     CHECK(events[0].item_id == 0);
-    CHECK_THAT(events[0].sq_distance, WithinAbs(0.0, 1e-10));
-    CHECK_THAT(events[0].time, WithinAbs((item1.position.x / gatherer.end_pos.x), 1e-10));
+    CHECK_THAT(events[0].sq_distance, WithinAbs(0.062, 1e-10));
+    CHECK_THAT(events[0].time, WithinRel((item1.position.x / gatherer.end_pos.x), 1e-10));
 
     /*Второй лут*/
     CHECK(events[1].gatherer_id == 0);
     CHECK(events[1].item_id == 1);
-    CHECK_THAT(events[1].sq_distance, WithinAbs(0.0, 1e-10));
-    CHECK_THAT(events[1].time, WithinAbs((item2.position.x / gatherer.end_pos.x), 1e-10));
+    CHECK_THAT(events[1].sq_distance, WithinAbs(0.0099, 1e-10));
+    CHECK_THAT(events[1].time, WithinRel((item2.position.x / gatherer.end_pos.x), 1e-10));
 }
 
 
 TEST_CASE("Собиратель нашёл один из двух предметов двигаяь по Х", FIND_GATHER_EVENTS_TAG) {
     using Catch::Matchers::WithinAbs;
+    using Catch::Matchers::WithinRel;
     collision_detector::Item item1{ {5.0, 0.5}, 0.0 };                     //лут лежит на (5,0.5)
     collision_detector::Item item2{ {8.0, 0.5}, 0.0 };                     //лут лежит на (5,0.5)
     collision_detector::Gatherer gatherer{ {0, 0}, {7.0, 0.5}, 0.7 };    //Искатель идёт от (0,0) до (5,0.5)
@@ -167,8 +169,8 @@ TEST_CASE("Собиратель нашёл один из двух предмет
 
     CHECK(events[0].gatherer_id == 0);
     CHECK(events[0].item_id == 0);
-    CHECK_THAT(events[0].sq_distance, WithinAbs(0.0, 1e-10));
-    CHECK_THAT(events[0].time, WithinAbs((item1.position.x / gatherer.end_pos.x), 1e-10));
+    CHECK_THAT(events[0].sq_distance, WithinAbs(0.02, 1e-10));
+    CHECK_THAT(events[0].time, WithinRel((item1.position.x / gatherer.end_pos.x), 1e-10));
 
 
 }
