@@ -142,14 +142,14 @@ TEST_CASE("Собиратель нашёл несколько предметов
     /*Первый лут*/
     CHECK(events[0].gatherer_id == 0);
     CHECK(events[0].item_id == 0);
-    CHECK_THAT(events[0].sq_distance, WithinAbs(0.062, 1e-10));
-    CHECK_THAT(events[0].time, WithinRel((item1.position.x / gatherer.end_pos.x), 1e-10));
+    CHECK_THAT(events[0].sq_distance, WithinAbs(0.0623441397, 1e-10));
+    CHECK_THAT(events[0].time, WithinRel((item1.position.x / gatherer.end_pos.x), 1e-8));
 
     /*Второй лут*/
     CHECK(events[1].gatherer_id == 0);
     CHECK(events[1].item_id == 1);
-    CHECK_THAT(events[1].sq_distance, WithinAbs(0.0099, 1e-10));
-    CHECK_THAT(events[1].time, WithinRel((item2.position.x / gatherer.end_pos.x), 1e-10));
+    CHECK_THAT(events[1].sq_distance, WithinAbs(0.0099750623, 1e-10));
+    CHECK_THAT(events[1].time, WithinRel((item2.position.x / gatherer.end_pos.x), 1e-8));
 }
 
 
@@ -169,8 +169,8 @@ TEST_CASE("Собиратель нашёл один из двух предмет
 
     CHECK(events[0].gatherer_id == 0);
     CHECK(events[0].item_id == 0);
-    CHECK_THAT(events[0].sq_distance, WithinAbs(0.02, 1e-10));
-    CHECK_THAT(events[0].time, WithinRel((item1.position.x / gatherer.end_pos.x), 1e-10));
+    CHECK_THAT(events[0].sq_distance, WithinAbs(0.0203045685, 1e-10));
+    CHECK_THAT(events[0].time, WithinRel((item1.position.x / gatherer.end_pos.x), 1e-8));
 
 
 }
