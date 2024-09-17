@@ -45,14 +45,6 @@ namespace app {
 
     void GameSession::StartGame() {
 
-        /*Запускаем генератор лута*/
-        lootTicker_ = std::make_shared<tickerTime::Ticker>(
-            strand_,
-            lootGenerator_.GetBaseInterval(),
-            std::bind(&GameSession::GenerateLoot, this, std::placeholders::_1) //https://en.cppreference.com/w/cpp/utility/functional/bind
-        );
-        lootTicker_->Start();
-
         /*Апдейтер игры. Запускаем, если не ручное управление временем*/
         if (gameRefreshPeriod_.count() != 0) {
             gameTicker_ = std::make_shared<tickerTime::Ticker>(
@@ -62,6 +54,16 @@ namespace app {
             );
             gameTicker_->Start();
         }
+
+        /*Запускаем генератор лута*/
+        lootTicker_ = std::make_shared<tickerTime::Ticker>(
+            strand_,
+            lootGenerator_.GetBaseInterval(),
+            std::bind(&GameSession::GenerateLoot, this, std::placeholders::_1) //https://en.cppreference.com/w/cpp/utility/functional/bind
+        );
+        lootTicker_->Start();
+
+
     };
 
     void GameSession::UpdateGameState(const TimeInterval& period) {
