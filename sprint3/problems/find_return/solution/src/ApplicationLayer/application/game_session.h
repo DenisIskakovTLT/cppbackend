@@ -48,7 +48,7 @@ namespace app {
         DogsId& GetDogs();
         const lostObjectsId& GetLostObj();
         void UpdateGameState(const TimeInterval& period);
-        void StartGame();
+        void StartGame();                                                       //Запуск игры
 
     private:
         std::shared_ptr<model::Map> map_;                                       //мапа
