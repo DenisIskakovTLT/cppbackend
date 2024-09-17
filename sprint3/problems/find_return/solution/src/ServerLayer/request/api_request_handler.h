@@ -109,6 +109,7 @@ namespace requestHandler {
         Send&& send) {
         StringResponse response(http::status::not_found, req.version());
         response.set(http::field::content_type, "application/json");
+        response.set(http::field::cache_control, "no-cache");
         response.body() = jsonOperation::MapNotFound();
         response.content_length(response.body().size());
         response.keep_alive(req.keep_alive());

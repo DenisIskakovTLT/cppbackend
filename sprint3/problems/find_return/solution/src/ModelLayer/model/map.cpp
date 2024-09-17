@@ -42,10 +42,10 @@ namespace model {
 
     void tag_invoke(json::value_from_tag, json::value& jv, const Office& office) {
         jv = { {OFFICE_ID, json::value_from(*(office.GetId()))},
-                {OFFICE_X, json::value_from(office.GetPosition().x)},
-                {OFFICE_Y, json::value_from(office.GetPosition().y)},
-                {OFFICE_OFFSET_X, json::value_from(office.GetOffset().dx)},
-                {OFFICE_OFFSET_Y, json::value_from(office.GetOffset().dy)} };
+                {OFFICE_X, json::value_from<int>(office.GetPosition().x)},
+                {OFFICE_Y, json::value_from<int>(office.GetPosition().y)},
+                {OFFICE_OFFSET_X, json::value_from<int>(office.GetOffset().dx)},
+                {OFFICE_OFFSET_Y, json::value_from<int>(office.GetOffset().dy)} };
     };
 
     Office tag_invoke(json::value_to_tag<Office>, const json::value& jv) {

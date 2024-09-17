@@ -25,16 +25,7 @@ namespace app {
             randomizePosition_{ randomize_pos },
             ioc_(ioc),
             strand_(std::make_shared<StrandApp>(net::make_strand(ioc))) {
-
-            if (tickPeriod_.count() != 0) {
-                ticker_ = std::make_shared<tickerTime::Ticker>(
-                    strand_,
-                    tickPeriod_,
-                    std::bind(&Application::UpdateGameState, this, std::placeholders::_1)
-                    );
-                ticker_->Start();
-            }
-        
+     
         };     //конструктор. 
 
         /*Запретить все копирования, присваивания и мувы*/
