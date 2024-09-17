@@ -15,7 +15,7 @@
 #include "command.h"    
 
 
-#define DEBUG
+//#define DEBUG
 
 using namespace std::literals;
 namespace net = boost::asio;
