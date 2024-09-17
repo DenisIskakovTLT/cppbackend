@@ -7,6 +7,7 @@
 #include "geom.h"
 
 #include <chrono>
+#include <memory>
 #include <string>
 #include <unordered_map>
 
