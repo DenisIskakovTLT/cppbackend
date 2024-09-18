@@ -131,13 +131,11 @@ namespace jsonOperation {
                 bag.push_back({ {RESPONSE_BAG_ITEM_ID, *(obj->GetId())},
                                 {RESPONSE_BAG_ITEM_TYPE, obj->GetType()} });
             }
-            boost::json::array score = dog->GetScore();
-
-            boost::json::value jv_item = { {RESPONSE_DOG_POSITION, pos},
-                                    {RESPONSE_DOG_SPEED, speed},
-                                    {RESPONSE_DOG_DIRECTION, model::DIRECTION_TO_JSON.at(dog->GetDirection())},
-                                    {RESPONSE_DOG_BAG, bag},
-                                    {RESPONSE_DOG_SCORE, score} };
+            boost::json::value jv_item = {  {RESPONSE_DOG_POSITION, pos},
+                                            {RESPONSE_DOG_SPEED, speed},
+                                            {RESPONSE_DOG_DIRECTION, model::DIRECTION_TO_JSON.at(dog->GetDirection())},
+                                            {RESPONSE_DOG_BAG, bag},
+                                            {RESPONSE_DOG_SCORE, dog->GetScore()} };
             objPLayers[ss.str()] = jv_item;
         }
         tmpRes[RESPONSE_PLAYERS] = objPLayers;
