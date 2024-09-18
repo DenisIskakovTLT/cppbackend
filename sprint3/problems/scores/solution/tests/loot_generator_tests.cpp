@@ -1,7 +1,7 @@
 #include <cmath>
 #include <catch2/catch_test_macros.hpp>
 
-#include "../src/ModelLayer/model/loot_generator.h"
+#include "../src/ModelLayer/loot_implement/loot_generator.h"
 
 using namespace std::literals;
 
