@@ -20,11 +20,11 @@ add_library(UserStaticLib STATIC
 	src/ModelLayer/collision/geom.h
 	src/ModelLayer/collision/collision_detector.cpp
 	src/ModelLayer/collision/collision_detector.h
-	src/ModelLayer/model/constdef.h
+	src/ModelLayer/type_const_defines/constdef.h
 	src/ModelLayer/model/dog.h
 	src/ModelLayer/model/dog.cpp
-	src/ModelLayer/model/dog_gather.h
-	src/ModelLayer/model/dog_gather.cpp
+	src/ModelLayer/gather/dog_gather.h
+	src/ModelLayer/gather/dog_gather.cpp
 	src/ModelLayer/model/game.h
 	src/ModelLayer/model/game.cpp
 	src/ModelLayer/model/map.cpp
@@ -33,12 +33,12 @@ add_library(UserStaticLib STATIC
 	src/ModelLayer/model/road.cpp
 	src/ModelLayer/model/road_layout.h
 	src/ModelLayer/model/road_layout.cpp
-	src/ModelLayer/model/typedef.h
-	src/ModelLayer/model/typedef.cpp
-	src/ModelLayer/model/loot_generator.h
-	src/ModelLayer/model/loot_generator.cpp
-	src/ModelLayer/model/lost_obj.h
-	src/ModelLayer/model/lost_obj.cpp
+	src/ModelLayer/type_const_defines/typedef.h
+	src/ModelLayer/type_const_defines/typedef.cpp
+	src/ModelLayer/loot_implement/loot_generator.h
+	src/ModelLayer/loot_implement/loot_generator.cpp
+	src/ModelLayer/loot_implement/lost_obj.h
+	src/ModelLayer/loot_implement/lost_obj.cpp
 	src/InterLayer/other/sdk.h
 	src/InterLayer/other/tagged.h
 	src/InterLayer/other/utils.h
@@ -49,8 +49,11 @@ add_library(UserStaticLib STATIC
 
 target_include_directories(UserStaticLib PUBLIC 
 	${ZLIB_INCLUDES}
-	src/ModelLayer/model
 	src/ModelLayer/collision
+	src/ModelLayer/gather
+	src/ModelLayer/loot_implement
+	src/ModelLayer/model
+	src/ModelLayer/type_const_defines
 	src/InterLayer/other
 	src/InterLayer/json
 )
