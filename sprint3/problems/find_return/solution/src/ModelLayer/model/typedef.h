@@ -45,7 +45,7 @@ namespace model {
         std::string name{ "" };
         std::string file{ "" };
         std::string type{ "" };
-        int rotation{ 0 };
+        int rotation{ -2147483648 };    
         std::string color{ "" };
         double scale{ 0.0 };
     };
