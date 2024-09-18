@@ -50,14 +50,14 @@ namespace logger {
 
     template <typename Body, typename Fields>
     struct ResponseLog {                                             //Структура для ответа
-        ResponseLog(std::string ip_addr, long res_time, const http::response<Body, Fields>& res) :
+        ResponseLog(std::string ip_addr, uint32_t res_time, const http::response<Body, Fields>& res) :
             ip(ip_addr),
             response_time(res_time),
             code(res.result_int()),
             content_type(res[http::field::content_type]) {};
 
         std::string ip;
-        long response_time;
+        uint32_t response_time;
         int code;
         std::string content_type;
     };

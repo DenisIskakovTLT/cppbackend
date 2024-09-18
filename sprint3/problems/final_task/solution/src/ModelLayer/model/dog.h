@@ -52,8 +52,8 @@ namespace model {
 
         const collision_detector::Gatherer& GetGatherer() const;                    //Геттер на собирателя
 
-        bool CheckFullBag();                                                        //Проверка что сумка полная
-        bool CheckEmptyBag();                                                       //Проверка что сумка пустая
+        bool CheckFullBag() const;                                                  //Проверка что сумка полная
+        bool CheckEmptyBag() const;                                                 //Проверка что сумка пустая
         void PickUpLoot(std::shared_ptr<LostObject> obj);                           //Поднять предмет
         void ReturnLootInOffice();                                                  //Сдать в офис найденный предмет
         const std::vector<std::shared_ptr<LostObject>>& GetBag() const;             //Геттер на сумку

@@ -54,7 +54,7 @@ namespace requestHandler {
     };
 
     template <typename Request>
-    bool GetMapListСheck(const Request& req) {
+    bool GetMapListCheck(const Request& req) {
         return req.target() == "/api/v1/maps" || req.target() == "/api/v1/maps/";
     }
 

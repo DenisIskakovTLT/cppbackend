@@ -45,7 +45,10 @@ namespace model {
         std::string name{ "" };
         std::string file{ "" };
         std::string type{ "" };
-        int rotation{ -2147483648 };    
+        /*-2147483648 (INT_MIN) по умолчанию, чтобы при отсутствие в конфигурации этого поля,
+        в респонсах это поле просто игнорировалось, а не выводилось со значением 0
+        */
+        int rotation{ INT_MIN };      
         std::string color{ "" };
         double scale{ 0.0 };
         size_t value{ 0 };

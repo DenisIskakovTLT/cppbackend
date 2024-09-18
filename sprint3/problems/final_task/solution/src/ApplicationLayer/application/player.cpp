@@ -57,7 +57,7 @@ namespace app {
     };
 
     void Player::PutDogInStartPosition(const model::Map& map) {
-        double x, y;
+
         auto roads = map.GetRoads();
         auto road = roads[0];
         dog_->SetPosition({ static_cast<double>(road.GetStart().x),

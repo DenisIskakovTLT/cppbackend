@@ -28,7 +28,7 @@ namespace model {
         try{
             tmpLostObj = dynamic_cast<model::LostObject*>(items_[idx].get());
         }
-        catch (std::bad_cast ex) {
+        catch (const std::bad_cast& ex) {
             std::cout << "Bad cast exception:" << ex.what();                //Что-то пошло не так с приведением типа
         }
         return tmpLostObj;

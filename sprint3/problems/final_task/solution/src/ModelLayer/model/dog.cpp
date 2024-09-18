@@ -79,11 +79,11 @@ namespace model {
         return gatherer_;
     };
 
-    bool Dog::CheckFullBag() {
+    bool Dog::CheckFullBag() const{
         return bag_.size() >= bagSize_;
     }
 
-    bool Dog::CheckEmptyBag() {
+    bool Dog::CheckEmptyBag() const{
         return bag_.size() == 0;
     }
 

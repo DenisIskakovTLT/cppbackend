@@ -46,7 +46,7 @@ namespace requestHandler {
             RHUnit<ActivatorType, HandlerType>(BadRequestCheck,
                                                             {{http::verb::get, BadRequest}},
                                                             BadRequest),
-            RHUnit<ActivatorType, HandlerType>(GetMapListСheck,
+            RHUnit<ActivatorType, HandlerType>(GetMapListCheck,
                                                             {{http::verb::get, GetMapList}},
                                                             BadRequest),
             RHUnit<ActivatorType, HandlerType>(GetMapByIdCheck,

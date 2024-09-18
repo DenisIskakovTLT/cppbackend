@@ -35,8 +35,8 @@ namespace app {
             map_(map),
             strand_(std::make_shared<SessionStrand>(net::make_strand(ioc))),
             id_(*(map->GetId())),
-            gameRefreshPeriod_(gameRefreshPeriod),
-            lootGenerator_(TimeInterval(static_cast<uint64_t>(cfg.period * model::CONVERT_MS_TO_S)), cfg.probability)
+            lootGenerator_(TimeInterval(static_cast<uint64_t>(cfg.period * model::CONVERT_MS_TO_S)), cfg.probability),
+            gameRefreshPeriod_(gameRefreshPeriod)
         {
 
         };
@@ -55,11 +55,12 @@ namespace app {
         std::shared_ptr<SessionStrand> strand_;                                 //стренд
         Id id_;                                                                 //айди
         loot_gen::LootGenerator lootGenerator_;                                 //лут генератор
+        TimeInterval gameRefreshPeriod_;                                        //Период обновления игры
         DogsId dogs_;                                                           //umap собак и айди к ним
         lostObjectsId lostObjects_;                                             //потерянные объекты
         std::shared_ptr<tickerTime::Ticker> lootTicker_;                        //Тикер для генерации лута
         std::shared_ptr<tickerTime::Ticker> gameTicker_;                        //Тикер для игры
-        TimeInterval gameRefreshPeriod_;                                        //Период обновления игры
+        
 
 
         void GenerateLoot(const TimeInterval& interval);                        //Генерация лута

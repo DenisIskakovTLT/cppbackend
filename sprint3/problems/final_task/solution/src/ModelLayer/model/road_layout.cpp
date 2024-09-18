@@ -105,11 +105,11 @@ namespace model {
 	std::optional<const RoadLayout::MapCoord> RoadLayout::GetDestinationRoadsOfRoute(
 		std::optional<const MapCoord> start,
 		std::optional<const MapCoord> end,
-		const Speed& old_velocity) {
+		const Speed& current_spd) {
 		const MapCoord start_coord = start.value();
 		MapCoord current_coord = start_coord;
-		if (old_velocity.vx != 0) {
-			int direction = std::signbit(old_velocity.vx) ? -1 : 1;
+		if (current_spd.vx != 0) {
+			int direction = std::signbit(current_spd.vx) ? -1 : 1;
 			int64_t end_x{ 0 };
 			if (end) {
 				end_x = end.value().x * CELL_FACTOR;
@@ -132,8 +132,8 @@ namespace model {
 			}
 			return current_coord;
 		}
-		else if (old_velocity.vy != 0) {
-			int direction = std::signbit(old_velocity.vy) ? -1 : 1;
+		else if (current_spd.vy != 0) {
+			int direction = std::signbit(current_spd.vy) ? -1 : 1;
 			int64_t end_y{ 0 };
 			if (end) {
 				end_y = end.value().y * CELL_FACTOR;
@@ -243,12 +243,12 @@ namespace model {
 	}
 
 	bool RoadLayout::IsValidPosition(const std::unordered_set<size_t>& roads, const geom::Point2D& pos) {
-		for (auto road_index : roads) {
-			if (IsValidPositionOnRoad(roads_[road_index], pos)) {
-				return true;
+
+		return std::any_of(roads_.begin(), roads_.end(), [this, &pos](const Road& road) {
+				return IsValidPositionOnRoad(road, pos);
 			}
-		}
-		return false;
+		);
+
 	};
 
 	bool RoadLayout::IsValidPositionOnRoad(const Road& road, const geom::Point2D& pos) {
