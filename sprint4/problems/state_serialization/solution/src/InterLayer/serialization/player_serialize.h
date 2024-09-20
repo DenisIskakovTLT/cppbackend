@@ -1,9 +1,9 @@
 #pragma once 
-#include <boost/serialization/vector.hpp>
-
-#include "dog_serialize.h"
 #include "player.h"
+#include "dog_serialize.h"
 #include "tokens.h"
+
+#include <boost/serialization/vector.hpp>
 
 namespace serialization {
 

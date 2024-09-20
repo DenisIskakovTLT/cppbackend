@@ -25,7 +25,7 @@ namespace tickerTime {
         };
 
         Ticker(net::io_context& ioc, const std::chrono::milliseconds& period, Handler handler) :
-            timer_(ioc),
+            timer_(ioc) ,
             period_{ period },
             handler_{ handler }{
         };

@@ -15,7 +15,7 @@ namespace http_handler {
 
     class RequestHandler {
     public:
-        explicit RequestHandler(app::Application& application, std::filesystem::path staticContentPath)
+        explicit RequestHandler(std::shared_ptr<app::Application> application, std::filesystem::path staticContentPath)
             : application_{ application }, staticContentPath_{ staticContentPath } {
         }
 
@@ -40,8 +40,8 @@ namespace http_handler {
         }
 
     private:
-        app::Application& application_;                 //Тут теперь апп, объект игры уже внутри апп, ио там же
-        std::filesystem::path staticContentPath_;       //Путь где зранятся файлы, static content
+        std::shared_ptr<app::Application> application_;         //Тут теперь апп, объект игры уже внутри апп, ио там же
+        std::filesystem::path staticContentPath_;               //Путь где зранятся файлы, static content
 
     };
 

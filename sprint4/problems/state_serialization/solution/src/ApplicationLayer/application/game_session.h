@@ -62,7 +62,6 @@ namespace app {
         TimeInterval gameRefreshPeriod_;                                        //Период обновления игры
         DogsId dogs_;                                                           //umap собак и айди к ним
         lostObjectsId lostObjects_;                                             //потерянные объекты
-        std::shared_ptr<tickerTime::Ticker> lootTicker_;                        //Тикер для генерации лута
         std::shared_ptr<tickerTime::Ticker> gameTicker_;                        //Тикер для игры
         
 

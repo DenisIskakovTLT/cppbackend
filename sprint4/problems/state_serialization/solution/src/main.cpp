@@ -48,8 +48,10 @@ int main(int argc, const char* argv[]) {
 #else
     std::optional<programm_option::Args> args;
     programm_option::Args tmpArgs;
-    tmpArgs.tick_period = 100;
+    tmpArgs.tick_period = 5000;
     tmpArgs.randomize_spawn_points = 0;
+    tmpArgs.saved_tick_period = 1000;
+    tmpArgs.save_file_path = "tmp/ololo.txt";
     args.emplace(tmpArgs);
 
 #endif
@@ -69,7 +71,7 @@ int main(int argc, const char* argv[]) {
         // 3. Инициализируем io_context
         const unsigned num_threads = std::thread::hardware_concurrency();
         net::io_context ioc(num_threads);
-        app::Application application(std::move(game), args.value().tick_period, args.value().randomize_spawn_points, ioc);
+        auto application = std::make_shared<app::Application>(std::move(game), args.value().tick_period, args.value().randomize_spawn_points, ioc);
 
         // 4. Восстановление сохранённой игры
         savegame::SavedFileParameters fileParameters;
@@ -80,7 +82,7 @@ int main(int argc, const char* argv[]) {
                 fileParameters.saved_tick_period = std::chrono::milliseconds(args.value().saved_tick_period);
             }
 
-            application.LoadGameFromSave(std::move(fileParameters));
+            application->LoadGameFromSave(std::move(fileParameters));
         }
 
 
@@ -90,7 +92,7 @@ int main(int argc, const char* argv[]) {
             if (!ec) {
                 BOOST_LOG_TRIVIAL(info) << logger::CreateLogMessage("server was forcibly closed."sv,
                     logger::ExitCodeLog(0));
-                application.SaveGame();
+                application->SaveGame();
                 ioc.stop();
             }
             });

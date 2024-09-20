@@ -12,7 +12,7 @@ namespace requestHandler {
     template<typename Request, typename Send>
     class ApiRequestHandlerProxy {
         using ActivatorType = bool(*)(const Request&);
-        using HandlerType = std::optional<size_t>(*)(const Request&, app::Application&, Send&&);
+        using HandlerType = std::optional<size_t>(*)(const Request&, std::shared_ptr<app::Application>, Send&&);
     public:
 
         /*Всё копирование запрещено*/
@@ -27,7 +27,7 @@ namespace requestHandler {
             return obj;
         };
 
-        bool Execute(const Request& req, app::Application& application, Send&& send) {
+        bool Execute(const Request& req, std::shared_ptr<app::Application> application, Send&& send) {
             for (auto item : requests_) {
                 if (item.GetActivator()(req)) {
                     auto res = item.GetHandler(req.method())(req, application, std::forward<Send>(send));

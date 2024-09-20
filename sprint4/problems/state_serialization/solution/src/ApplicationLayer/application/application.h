@@ -31,8 +31,7 @@ namespace app {
             game_(std::move(game)),
             tickPeriod_{ tick_period },
             randomizePosition_{ randomize_pos },
-            ioc_(ioc),
-            strand_(std::make_shared<StrandApp>(net::make_strand(ioc))) {
+            ioc_(ioc){
      
         };     //конструктор. 
 
@@ -50,7 +49,6 @@ namespace app {
         const std::vector< std::weak_ptr<Player> >& GetPlayersFromSession(auth::Token token);               //Посмотреть сколько играют
         bool CheckPlayerByToken(auth::Token token);                                                         //Чекнуть, если такой в игре
         void MovePlayer(const auth::Token& token, model::Direction direction);                              //Передвижение игрока
-        std::shared_ptr<StrandApp> GetStrand();                                                             //Геттер, на всякий случай...
         bool CheckTimeManage() const;                                                                       //Как управляем временем, вручную или нет
         void UpdateGameState(const std::chrono::milliseconds& time);                                        //апдейтим состояние игры
         void AddGameSession(std::shared_ptr<GameSession> session);                                          //Добавить сессию
@@ -76,7 +74,6 @@ namespace app {
         SessionIdToIndex sessionID_;                                                                        //ID сессии
         auth::PlayerTokens playerTokens_;
         net::io_context& ioc_;
-        std::shared_ptr<StrandApp> strand_;                                                                 //На всякий случай...
         
         std::vector< std::shared_ptr<GameSession> > sessions_;                                              //из гейм сессии перенос, после рефактора
         MapIdToSessionIndex mapIdToSessionIndex_;                                                           //из гейм сессии перенос, после рефактора
@@ -88,12 +85,11 @@ namespace app {
 
         /*Тут всё для сохранения и восстановления игры*/
         savegame::SavedFileParameters savedParameters_;
-        std::shared_ptr<tickerTime::Ticker> saveTicker_;                                                    //Тикер для периодического сохранения
+        std::shared_ptr<tickerTime::Ticker> saveTicker_;                                                    //Тикер для переодичного сейва
         std::unordered_map<std::shared_ptr<GameSession>, TokenPlayer> sessionToTokenPlayer_;                //Мапа сессий с токенами игроков
         void DeserializationGameState();                                                                    //Десериализация загруженных параметров
-        void StartSaveTicker();                                                                             //Запустить тикер периодических сохранений
         std::vector<serialization::GameSessionRepr>SerializeGame();                                         //Сериализировать игру, чтоб сохранить
-        void SaveGamePeriodically(const std::chrono::milliseconds& time);                                   //Созранение игры по апдейту
+        void SaveGamePeriodically(const std::chrono::milliseconds& time);                                   //Сохранение игры по апдейту
     };
 
 }

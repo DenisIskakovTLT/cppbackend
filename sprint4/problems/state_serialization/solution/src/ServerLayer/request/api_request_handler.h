@@ -42,7 +42,7 @@ namespace requestHandler {
     template <typename Request, typename Send>
     std::optional<size_t> BadRequest(
         const Request& req,
-        app::Application& application,
+        std::shared_ptr<app::Application> application,
         Send&& send) {
         StringResponse response(http::status::bad_request, req.version());
         response.set(http::field::content_type, "application/json");
@@ -61,12 +61,12 @@ namespace requestHandler {
     template <typename Request, typename Send>
     std::optional<size_t> GetMapList(
         const Request& req,
-        app::Application& application,
+        std::shared_ptr<app::Application> application,
         Send&& send) {
         StringResponse response(http::status::ok, req.version());
         response.set(http::field::content_type, "application/json");
         response.set(http::field::cache_control, "no-cache");
-        response.body() = jsonOperation::GameToJson(application.ListMap());
+        response.body() = jsonOperation::GameToJson(application->ListMap());
         response.content_length(response.body().size());
         response.keep_alive(req.keep_alive());
         send(response);
@@ -85,10 +85,10 @@ namespace requestHandler {
     template <typename Request, typename Send>
     std::optional<size_t> GetMapById(
         const Request& req,
-        app::Application& application,
+        std::shared_ptr<app::Application>application,
         Send&& send) {
         auto id = SplitStr(req.target())[3];
-        auto map = application.FindMap(model::Map::Id(std::string(id)));
+        auto map = application->FindMap(model::Map::Id(std::string(id)));
         if (map == nullptr) {
             return 0;
         }
@@ -105,7 +105,7 @@ namespace requestHandler {
     template <typename Request, typename Send>
     std::optional<size_t> MapNotFound(
         const Request& req,
-        app::Application& application,
+        std::shared_ptr<app::Application> application,
         Send&& send) {
         StringResponse response(http::status::not_found, req.version());
         response.set(http::field::content_type, "application/json");
@@ -126,7 +126,7 @@ namespace requestHandler {
     template <typename Request, typename Send>
     std::optional<size_t> JoinToGameInvalidJson(
         const Request& req,
-        app::Application& application,
+        std::shared_ptr<app::Application> application,
         Send&& send) {
         StringResponse response(http::status::bad_request, req.version());
         response.set(http::field::content_type, "application/json");
@@ -154,7 +154,7 @@ namespace requestHandler {
     template <typename Request, typename Send>
     std::optional<size_t> JoinToGameEmptyPlayerName(
         const Request& req,
-        app::Application& application,
+        std::shared_ptr<app::Application> application,
         Send&& send) {
         StringResponse response(http::status::bad_request, req.version());
         response.set(http::field::content_type, "application/json");
@@ -174,13 +174,13 @@ namespace requestHandler {
     template <typename Request, typename Send>
     std::optional<size_t>  JoinToGame(
         const Request& req,
-        app::Application& application,
+        std::shared_ptr<app::Application> application,
         Send&& send) {
         auto [player_name, map_id] = jsonOperation::ParseJoinToGame(req.body()).value();
-        if (application.FindMap(map_id) == nullptr) {
+        if (application->FindMap(map_id) == nullptr) {
             return 0;
         }
-        auto [token, player_id] = application.JoinGame(player_name, map_id);
+        auto [token, player_id] = application->JoinGame(player_name, map_id);
         StringResponse response(http::status::ok, req.version());
         response.set(http::field::content_type, "application/json");
         response.set(http::field::cache_control, "no-cache");
@@ -194,7 +194,7 @@ namespace requestHandler {
     template <typename Request, typename Send>
     std::optional<size_t> JoinToGameMapNotFound(
         const Request& req,
-        app::Application& application,
+        std::shared_ptr<app::Application> application,
         Send&& send) {
         StringResponse response(http::status::not_found, req.version());
         response.set(http::field::content_type, "application/json");
@@ -209,7 +209,7 @@ namespace requestHandler {
     template <typename Request, typename Send>
     std::optional<size_t> OnlyPostMethodAllowed(
         const Request& req,
-        app::Application& application,
+        std::shared_ptr<app::Application> application,
         Send&& send) {
         StringResponse response(http::status::method_not_allowed, req.version());
         response.set(http::field::content_type, "application/json");
@@ -235,7 +235,7 @@ namespace requestHandler {
     template <typename Request, typename Send>
     std::optional<size_t> EmptyAuthorization(
         const Request& req,
-        app::Application& application,
+        std::shared_ptr<app::Application> application,
         Send&& send) {
         StringResponse response(http::status::unauthorized, req.version());
         response.set(http::field::content_type, "application/json");
@@ -255,13 +255,13 @@ namespace requestHandler {
     template <typename Request, typename Send>
     std::optional<size_t> GetPlayersList(
         const Request& req,
-        app::Application& application,
+        std::shared_ptr<app::Application> application,
         Send&& send) {
         auth::Token token{ GetBearerToken(req[http::field::authorization]) };
-        if (!application.CheckPlayerByToken(token)) {
+        if (!application->CheckPlayerByToken(token)) {
             return 0;
         }
-        auto players = application.GetPlayersFromSession(token);
+        auto players = application->GetPlayersFromSession(token);
         StringResponse response(http::status::ok, req.version());
         response.set(http::field::content_type, "application/json");
         response.set(http::field::cache_control, "no-cache");
@@ -275,7 +275,7 @@ namespace requestHandler {
     template <typename Request, typename Send>
     std::optional<size_t> InvalidMethod(
         const Request& req,
-        app::Application& application,
+        std::shared_ptr<app::Application> application,
         Send&& send) {
         StringResponse response(http::status::method_not_allowed, req.version());
         response.set(http::field::content_type, "application/json");
@@ -296,17 +296,17 @@ namespace requestHandler {
     template <typename Request, typename Send>
     std::optional<size_t> GetGameState(
         const Request& req,
-        app::Application& application,
+        std::shared_ptr<app::Application> application,
         Send&& send) {
         auth::Token token{ GetBearerToken(req[http::field::authorization]) };
-        if (!application.CheckPlayerByToken(token)) {
+        if (!application->CheckPlayerByToken(token)) {
             return 0;
         }
-        auto players = application.GetPlayersFromSession(token);
+        auto players = application->GetPlayersFromSession(token);
         StringResponse response(http::status::ok, req.version());
         response.set(http::field::content_type, "application/json");
         response.set(http::field::cache_control, "no-cache");
-        response.body() = jsonOperation::GameState(players, application.GetGameSessionByToken(token)->GetLostObj());
+        response.body() = jsonOperation::GameState(players, application->GetGameSessionByToken(token)->GetLostObj());
         response.content_length(response.body().size());
         response.keep_alive(req.keep_alive());
         send(response);
@@ -326,7 +326,7 @@ namespace requestHandler {
     template <typename Request, typename Send>
     std::optional<size_t> InvalidContentType(
         const Request& req,
-        app::Application& application,
+        std::shared_ptr<app::Application> application,
         Send&& send) {
         StringResponse response(http::status::bad_request, req.version());
         response.set(http::field::content_type, "application/json");
@@ -352,7 +352,7 @@ namespace requestHandler {
     template <typename Request, typename Send>
     std::optional<size_t> PlayerInvalidAction(
         const Request& req,
-        app::Application& application,
+        std::shared_ptr<app::Application> application,
         Send&& send) {
         StringResponse response(http::status::bad_request, req.version());
         response.set(http::field::content_type, "application/json");
@@ -372,14 +372,14 @@ namespace requestHandler {
     template <typename Request, typename Send>
     std::optional<size_t> PlayerAction(
         const Request& req,
-        app::Application& application,
+        std::shared_ptr<app::Application> application,
         Send&& send) {
         auth::Token token{ GetBearerToken(req[http::field::authorization]) };
-        if (!application.CheckPlayerByToken(token)) {
+        if (!application->CheckPlayerByToken(token)) {
             return 0;
         }
         std::string directionStr = jsonOperation::ParsePlayerActionRequest(req.body()).value();
-        application.MovePlayer(token, model::JSON_TO_DIRECTION.at(directionStr));
+        application->MovePlayer(token, model::JSON_TO_DIRECTION.at(directionStr));
         StringResponse response(http::status::ok, req.version());
         response.set(http::field::content_type, "application/json");
         response.set(http::field::cache_control, "no-cache");
@@ -393,7 +393,7 @@ namespace requestHandler {
     template <typename Request, typename Send>
     std::optional<size_t> UnknownToken(
         const Request& req,
-        app::Application& application,
+        std::shared_ptr<app::Application>  application,
         Send&& send) {
         StringResponse response(http::status::unauthorized, req.version());
         response.set(http::field::content_type, "application/json");
@@ -408,7 +408,7 @@ namespace requestHandler {
     template <typename Request, typename Send>
     std::optional<size_t> PageNotFound(
         const Request& req,
-        app::Application& application,
+        std::shared_ptr<app::Application> application,
         Send&& send) {
         StringResponse response(http::status::not_found, req.version());
         response.set(http::field::content_type, "application/json");
@@ -431,9 +431,9 @@ namespace requestHandler {
     template <typename Request, typename Send>
     std::optional<size_t> InvalidDeltaTime(
         const Request& req,
-        app::Application& application,
+        std::shared_ptr<app::Application> application,
         Send&& send) {
-        if (!application.CheckTimeManage()) {
+        if (!application->CheckTimeManage()) {
             return 0;
         }
         StringResponse response(http::status::bad_request, req.version());
@@ -455,10 +455,10 @@ namespace requestHandler {
     template <typename Request, typename Send>
     std::optional<size_t> SetDeltaTime(
         const Request& req,
-        app::Application& application,
+        std::shared_ptr<app::Application> application,
         Send&& send) {
 
-        if (!application.CheckTimeManage()) {                                   //--tick-period передан
+        if (!application->CheckTimeManage()) {                                   //--tick-period передан
             StringResponse response(http::status::bad_request, req.version());
             response.set(http::field::content_type, "application/json");
             response.set(http::field::cache_control, "no-cache");
@@ -468,18 +468,16 @@ namespace requestHandler {
             send(response);
         }
         else {
-            boost::asio::dispatch(*application.GetStrand(), [req = std::move(req), application = &application, send = std::move(send)]{
-                int delta_time = jsonOperation::ParseSetDeltaTimeRequest(req.body()).value();
-                std::chrono::milliseconds dtime(delta_time);
-                application->UpdateGameState(dtime);
-                StringResponse response(http::status::ok, req.version());
-                response.set(http::field::content_type, "application/json");
-                response.set(http::field::cache_control, "no-cache");
-                response.body() = jsonOperation::SetDeltaTime();
-                response.content_length(response.body().size());
-                response.keep_alive(req.keep_alive());
-                send(response);
-            });
+            int delta_time = jsonOperation::ParseSetDeltaTimeRequest(req.body()).value();
+            std::chrono::milliseconds dtime(delta_time);
+            application->UpdateGameState(dtime);
+            StringResponse response(http::status::ok, req.version());
+            response.set(http::field::content_type, "application/json");
+            response.set(http::field::cache_control, "no-cache");
+            response.body() = jsonOperation::SetDeltaTime();
+            response.content_length(response.body().size());
+            response.keep_alive(req.keep_alive());
+            send(response);
         }
 
         return std::nullopt;
@@ -488,12 +486,12 @@ namespace requestHandler {
     template <typename Request, typename Send>
     std::optional<size_t> InvalidEndpoint(
         const Request& req,
-        app::Application& application,
+        std::shared_ptr<app::Application> application,
         Send&& send) {
-        StringResponse response(application.CheckTimeManage() ? http::status::method_not_allowed : http::status::bad_request, req.version());
+        StringResponse response(application->CheckTimeManage() ? http::status::method_not_allowed : http::status::bad_request, req.version());
         response.set(http::field::content_type, "application/json");
         response.set(http::field::cache_control, "no-cache");
-        response.body() = application.CheckTimeManage() ? jsonOperation::InvalidMethod() : jsonOperation::InvalidEndpoint();
+        response.body() = application->CheckTimeManage() ? jsonOperation::InvalidMethod() : jsonOperation::InvalidEndpoint();
         response.content_length(response.body().size());
         response.keep_alive(req.keep_alive());
         send(response);

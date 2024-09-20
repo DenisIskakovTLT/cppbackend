@@ -62,6 +62,7 @@ namespace app {
         return !playerTokens_.FindPlayerByToken(token).expired();
     };
 
+    /*Сюда попадаем, только если ручное управление временем*/
     void Application::UpdateGameState(const std::chrono::milliseconds& time) {
 
         for (auto session: sessions_) {
@@ -69,10 +70,6 @@ namespace app {
         }
 
         SaveGamePeriodically(time);
-    };
-
-    std::shared_ptr<Application::StrandApp> Application::GetStrand() {
-        return strand_;
     };
 
     void Application::MovePlayer(const auth::Token& token, model::Direction direction) {
@@ -123,11 +120,13 @@ namespace app {
         }
 
         std::vector<serialization::GameSessionRepr> serializedSessions = SerializeGame();
-        std::ofstream outputFile;
-        outputFile.open(savedParameters_.save_file_path.value());
+        std::fstream outputFile;
+        outputFile.open(savedParameters_.save_file_path.value(), std::ios_base::out);
+        {
+            boost::archive::text_oarchive oarchive{ outputFile };
+            oarchive << serializedSessions;
+        }
 
-        boost::archive::text_oarchive oarchive{ outputFile };
-        oarchive << serializedSessions;
     }
 
     std::vector<serialization::GameSessionRepr> Application::SerializeGame() {
@@ -141,6 +140,7 @@ namespace app {
     }
 
     void Application::LoadGameFromSave(savegame::SavedFileParameters parameters) {
+
         savedParameters_ = parameters;
 
         /*Тут загрузка параметров, десериализация из файла*/
@@ -151,8 +151,15 @@ namespace app {
             return;  //Переданы пустые параметры, ни файла ни периода или ручное управление временем. Уходим.
         }
 
-        /*Запускаем тикер для периодических сохранений*/
-        StartSaveTicker();
+        /*Включим тикер на сохранения*/
+        saveTicker_ = std::make_shared<tickerTime::Ticker>(
+            ioc_,
+            savedParameters_.saved_tick_period.value(),
+            [self = shared_from_this()](const std::chrono::milliseconds& time) {
+                self->SaveGame();
+            });
+
+        saveTicker_->Start();
     }
 
     void Application::DeserializationGameState() {
@@ -162,11 +169,11 @@ namespace app {
         }
 
         std::vector<serialization::GameSessionRepr> serializedSession_;        //Сюда считаем сериализованные сессии
-        std::ifstream inputFile;
-        inputFile.open(savedParameters_.save_file_path.value());
+        std::fstream inputFile;
+        inputFile.open(savedParameters_.save_file_path.value(), std::ios_base::in);
 
         if (!inputFile.is_open()) {
-            return;             //файл не открылся, выходим
+            return;             //файл не открылся, значит его нет, выходим
         }
 
         boost::archive::text_iarchive iarchive{ inputFile };
@@ -202,18 +209,6 @@ namespace app {
             AddGameSession(tmpGameSession);
             tmpGameSession->StartGame();
         }
-    }
-
-    void Application::StartSaveTicker() {
-
-        saveTicker_ = std::make_shared<tickerTime::Ticker>(
-            ioc_,
-            savedParameters_.saved_tick_period.value(),
-            [self = shared_from_this()](const std::chrono::milliseconds& time) {
-                self->SaveGame();
-            }
-        );
-        saveTicker_->Start();
     }
 
     void Application::SaveGamePeriodically(const std::chrono::milliseconds& time) {
