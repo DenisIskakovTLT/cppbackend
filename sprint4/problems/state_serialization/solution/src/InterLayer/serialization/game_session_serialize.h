@@ -1,5 +1,6 @@
 #pragma once 
 
+#include <vector>
 #include <boost/serialization/vector.hpp>
 
 #include "game_session.h"

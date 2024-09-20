@@ -1,12 +1,9 @@
 #include "application.h"
-#include "dog.h"
-#include "game_session_serialize.h"
 
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 
-#include <iostream>
-#include <fstream>
+#include "player_serialize.h"
 
 namespace app {
 
