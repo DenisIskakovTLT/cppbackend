@@ -26,7 +26,7 @@ RUN cd /app/build && \
     
     
 # Второй контейнер в том же докерфайле
-FROM ubuntu:22.04 as run
+FROM ubuntu:24.04 as run
 
 # Создадим пользователя www
 RUN groupadd -r www && useradd -r -g www www
