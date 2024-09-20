@@ -144,21 +144,21 @@ jobs:
           # ./command_line/run.sh
 
 
-  sprint_3:
-    runs-on: ubuntu-22.04
-    steps:
+  # sprint_3:
+    # runs-on: ubuntu-22.04
+    # steps:
 
-      - name: Checkout code & tests
-        uses: actions/checkout@v3
-        with:
-          submodules: true
+      # - name: Checkout code & tests
+        # uses: actions/checkout@v3
+        # with:
+          # submodules: true
 
-      - name: Install dependencies
-        run: |
-          pip uninstall conan -y
-          pip install -U conan==1.59.0
-          pip install -r requirements.txt
-          pip show pytest
+      # - name: Install dependencies
+        # run: |
+          # pip uninstall conan -y
+          # pip install -U conan==1.59.0
+          # pip install -r requirements.txt
+          # pip show pytest
 
       # - name: run tests sprint3 instrumentation
         # run: |

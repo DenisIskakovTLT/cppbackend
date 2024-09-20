@@ -1,6 +1,7 @@
 #pragma once
 
 #include <chrono>
+#include <climits>
 #include <string>
 #include <optional>
 #include <unordered_map>
