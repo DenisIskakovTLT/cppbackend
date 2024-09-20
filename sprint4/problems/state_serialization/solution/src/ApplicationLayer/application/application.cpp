@@ -31,6 +31,7 @@ namespace app {
             session->StartGame();
         }
         tokenToSessionIndex_[token] = session;
+        sessionToTokenPlayer_[session][token] = player;
         BindPlayerInSession(player, session);
         return std::tie(token, player->GetId());
     };
@@ -156,7 +157,7 @@ namespace app {
             ioc_,
             savedParameters_.saved_tick_period.value(),
             [self = shared_from_this()](const std::chrono::milliseconds& time) {
-                self->SaveGame();
+                self->SaveGamePeriodically(time);
             });
 
         saveTicker_->Start();
