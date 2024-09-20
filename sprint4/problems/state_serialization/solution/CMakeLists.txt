@@ -119,7 +119,7 @@ target_include_directories(game_server PRIVATE
 	src/ServerLayer/server
 
 )
-target_link_libraries(game_server PRIVATE Threads::Threads Boost::log Boost::log_setup Boost::program_options UserStaticLib)
+target_link_libraries(game_server PRIVATE Threads::Threads CONAN_PKG::boost UserStaticLib)
 
 include(CTest)
 include(${CONAN_BUILD_DIRS_CATCH2}/Catch.cmake)
