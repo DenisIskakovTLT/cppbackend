@@ -86,10 +86,10 @@ add_executable(game_server
 	src/InterLayer/serialization/lo_serialize.h
 	src/InterLayer/serialization/lo_serialize.cpp
 	src/InterLayer/serialization/player_serialize.h
-	src/InterLayer/serialization/player_serialize.h
+	src/InterLayer/serialization/player_serialize.cpp
 	src/InterLayer/serialization/game_session_serialize.h
 	src/InterLayer/serialization/game_session_serialize.cpp
-	src/InterLayer/serialization/dog_serialize.cpp
+	src/InterLayer/serialization/dog_serialize.h
 	src/InterLayer/serialization/dog_serialize.cpp
 	src/ServerLayer/request/api_request_handler.h
 	src/ServerLayer/request/api_request_handler_proxy.h
