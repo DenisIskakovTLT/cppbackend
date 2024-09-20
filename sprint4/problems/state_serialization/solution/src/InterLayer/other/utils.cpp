@@ -1,5 +1,6 @@
 #include "utils.h"
 #include <string>
+#include <random>
 
 namespace requestHandler {
 
@@ -59,21 +60,31 @@ namespace randomgen {
 
     double RandomDouble(const double thl, const double thh) {
         std::random_device rd;
-        std::default_random_engine eng(rd());
-        std::uniform_real_distribution<double> distr(thl, thh);
+        std::mt19937 eng(rd());
+        double low = 0.0;
+        double high = 0.0;
+        if (thh >= thl) {
+            high = thh;
+            low = thl;
+        }
+        else {
+            high = thl;
+            low = thh;
+        }
+        std::uniform_real_distribution<double> distr(low, high);
         return distr(eng);
     };
 
     int RandomInt(const int thl, const int thh) {
         std::random_device rd;
-        std::default_random_engine eng(rd());
+        std::mt19937 eng(rd());
         std::uniform_int_distribution<int> distr(thl, thh);
         return distr(eng);
     };
 
     size_t RandomLootType(const size_t lower, const size_t upper) {
         std::random_device rd;
-        std::default_random_engine eng(rd());
+        std::mt19937 eng(rd());
         std::uniform_int_distribution<size_t> distr(lower, upper);
         return distr(eng);
     };
