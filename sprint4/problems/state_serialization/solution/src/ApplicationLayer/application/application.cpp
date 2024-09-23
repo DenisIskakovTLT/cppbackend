@@ -157,7 +157,7 @@ namespace app {
             ioc_,
             savedParameters_.saved_tick_period.value(),
             [self = shared_from_this()](const std::chrono::milliseconds& time) {
-                self->SaveGamePeriodically(time);
+                self->SaveGame();
             });
 
         saveTicker_->Start();
