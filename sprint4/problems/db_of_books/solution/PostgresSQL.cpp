@@ -29,6 +29,16 @@ struct Request {
     boost::json::value payload;
 };
 
+struct Res {
+    std::string res;
+};
+
+void tag_invoke(boost::json::value_from_tag, boost::json::value& jv, Res const& res) {
+    boost::json::object obj;
+    obj["result"] = res.res;
+    jv.emplace_object() = obj;
+}
+
 Request ParseRequest(std::string str) {
     // Распарсить строку как JSON, используя boost::json::parse
     // Получаем json-объект из строки (тип value)
@@ -76,7 +86,7 @@ boost::json::object AddBook(pqxx::connection& conn, const boost::json::value& pa
     }
 
     try {
-        // Создаём транзакцию.
+        
         pqxx::work w(conn);
         std::optional<std::string> ISBN = std::nullopt;
         if (tmpBook.ISBN != "null") {
@@ -95,13 +105,14 @@ boost::json::object AddBook(pqxx::connection& conn, const boost::json::value& pa
 }
 
 boost::json::array OutAllBooks(pqxx::connection& conn) {
+
     auto query = "SELECT * FROM books ORDER BY year DESC, title, author, ISBN"_zv;
-    // Создаём транзакцию чтения.
+    
     pqxx::read_transaction r(conn);
 
     boost::json::array jsonArray;
 
-    // Выполняем запрос и итерируемся по строкам ответа
+    
     for (auto [id, title, author, year, ISBN]
         : r.query<int, std::string_view, std::string_view, int, std::optional<std::string>>(query))
     {
@@ -132,14 +143,11 @@ int main(int argc, const char* argv[])
             return EXIT_FAILURE;
         }
 
-        // Подключаемся к БД, указывая её параметры в качестве аргумента
+
         pqxx::connection conn{ argv[1] };
 
-        // Создаём базу данных, если её нет
-        // Создаём транзакцию. Транзакция нужна, чтобы выполнять запросы.
         pqxx::work w(conn);
-
-        // Используя транзакцию создадим таблицу в выбранной базе данных:
+        
         w.exec(
             "CREATE TABLE IF NOT EXISTS books (id SERIAL PRIMARY KEY, title varchar(100) NOT NULL, author varchar(100) NOT NULL, year integer NOT NULL, ISBN varchar(13) UNIQUE);"_zv);
 
