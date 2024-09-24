@@ -13,6 +13,8 @@
 
 #include <pqxx/pqxx>
 
+//#define DEBUG
+
 using namespace std::literals;
 // libpqxx использует zero-terminated символьные литералы вроде "abc"_zv;
 using pqxx::operator"" _zv;
@@ -134,6 +136,12 @@ boost::json::array OutAllBooks(pqxx::connection& conn) {
 int main(int argc, const char* argv[])
 {
     try {
+#ifdef DEBUG
+        argc = 2;
+        argv[1] = "postgres://postgres:12345@localhost:5432/test_db";
+#else
+#endif
+        
         if (argc == 1) {
             std::cout << "Usage: db_example <conn-string>\n"sv;
             return EXIT_SUCCESS;
@@ -142,16 +150,14 @@ int main(int argc, const char* argv[])
             std::cerr << "Invalid command line\n"sv;
             return EXIT_FAILURE;
         }
-
-
         pqxx::connection conn{ argv[1] };
 
-        pqxx::work w(conn);
+        pqxx::work transact(conn);
         
-        w.exec(
+        transact.exec(
             "CREATE TABLE IF NOT EXISTS books (id SERIAL PRIMARY KEY, title varchar(100) NOT NULL, author varchar(100) NOT NULL, year integer NOT NULL, ISBN varchar(13) UNIQUE);"_zv);
-
-        w.commit();
+        transact.exec("DELETE FROM books;"_zv);
+        transact.commit();
 
         conn.prepare("add_book"_zv, "INSERT INTO books (title, author, year, ISBN) VALUES ($1, $2, $3, $4)"_zv);
         conn.prepare("all_books"_zv, "SELECT * FROM books;"_zv);
