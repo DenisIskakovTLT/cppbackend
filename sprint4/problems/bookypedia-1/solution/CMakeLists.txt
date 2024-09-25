@@ -3,36 +3,31 @@ cmake_minimum_required(VERSION 3.11)
 project(bookypedia CXX)
 set(CMAKE_CXX_STANDARD 20)
 
-include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+include(${CMAKE_BINARY_DIR}/conanbuildinfo_multi.cmake)
 conan_basic_setup(TARGETS)
-
-find_package(Boost 1.85.0 REQUIRED)
-if(Boost_FOUND)
-  include_directories(${Boost_INCLUDE_DIRS})
-endif()
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
 add_library(libbookypedia STATIC
-	src/menu/menu.cpp
-	src/menu/menu.h
-	src/ui/view.cpp
-	src/ui/view.h
-	src/app/use_cases.h
-	src/app/use_cases_impl.cpp
-	src/app/use_cases_impl.h
-	src/domain/author.cpp
-	src/domain/author.h
-	src/domain/author_fwd.h
-	src/domain/book.cpp
-	src/domain/book.h
-	src/domain/book_fwd.h
-	src/util/tagged.h
-	src/util/tagged_uuid.cpp
-	src/util/tagged_uuid.h
-	src/postgres/postgres.cpp
-	src/postgres/postgres.h
+	src/menu.cpp
+	src/menu.h
+	src/view.cpp
+	src/view.h
+	src/use_cases.h
+	src/use_cases_impl.cpp
+	src/use_cases_impl.h
+	src/author.cpp
+	src/author.h
+	src/book.cpp
+	src/book.h
+	src/author_fwd.h
+	src/book_fwd.h
+	src/tagged.h
+	src/tagged_uuid.cpp
+	src/tagged_uuid.h
+	src/postgres.cpp
+	src/postgres.h
 )
 target_link_libraries(libbookypedia PUBLIC CONAN_PKG::boost Threads::Threads CONAN_PKG::libpq CONAN_PKG::libpqxx)
 
@@ -47,4 +42,4 @@ add_executable(tests
 	tests/use_case_tests.cpp
 	tests/tagged_uuid_tests.cpp
 )
-target_link_libraries(tests PRIVATE CONAN_PKG::catch2 libbookypedia)
+target_link_libraries(tests PRIVATE CONAN_PKG::catch2 CONAN_PKG::gtest libbookypedia)
