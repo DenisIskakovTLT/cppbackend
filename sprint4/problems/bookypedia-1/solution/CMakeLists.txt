@@ -10,24 +10,35 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
 add_library(libbookypedia STATIC
-	src/menu.cpp
-	src/menu.h
-	src/view.cpp
-	src/view.h
-	src/use_cases.h
-	src/use_cases_impl.cpp
-	src/use_cases_impl.h
-	src/author.cpp
-	src/author.h
-	src/book.cpp
-	src/book.h
-	src/author_fwd.h
-	src/book_fwd.h
-	src/tagged.h
-	src/tagged_uuid.cpp
-	src/tagged_uuid.h
-	src/postgres.cpp
-	src/postgres.h
+	src/menu/menu.cpp
+	src/menu/menu.h
+	src/ui/view.cpp
+	src/ui/view.h
+	src/app/use_cases.h
+	src/app/use_cases_impl.cpp
+	src/app/use_cases_impl.h
+	src/domain/author.cpp
+	src/domain/author.h
+	src/domain/book.cpp
+	src/domain/book.h
+	src/domain/author_fwd.h
+	src/domain/book_fwd.h
+	src/util/tagged.h
+	src/util/tagged_uuid.cpp
+	src/util/tagged_uuid.h
+	src/postgres/postgres.cpp
+	src/postgres/postgres.h
+)
+
+target_include_directories(libbookypedia PUBLIC 
+	${ZLIB_INCLUDES}
+	src/app
+	src/domain
+	src/menu
+	src/postgres
+	src/ui
+	src/util
+
 )
 target_link_libraries(libbookypedia PUBLIC CONAN_PKG::boost Threads::Threads CONAN_PKG::libpq CONAN_PKG::libpqxx)
 
