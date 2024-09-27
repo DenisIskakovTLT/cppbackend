@@ -347,6 +347,8 @@ bool View::DeleteAutor(std::istream& cmd_input) const {
         auto author = GetAuthorByName(authorName);
         DeleteBooksByAuthorId(author.id);
         use_cases_.DeleteAuthor(author.id, author.name); //В самую последнюю очередь, т.к. с айди связаны книги и теги
+
+
     }
     catch (const std::exception& e) {
         output_ << "Failed to delete author"sv << std::endl;
