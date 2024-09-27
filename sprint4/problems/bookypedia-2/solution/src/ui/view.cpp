@@ -63,7 +63,7 @@ View::View(menu::Menu& menu, app::UseCases& use_cases, std::istream& input, std:
     );
     menu_.AddAction("AddBook"s, "<pub year> <title>"s, "Adds book"s,
                     std::bind(&View::AddBook, this, ph::_1));
-    menu_.AddAction("ShowAuthors"s, {}, "Show authors"s, std::bind(&View::ShowAuthors, this));
+    menu_.AddAction("ShowAuthors"s, {}, "Show authors"s, std::bind(&View::ShowAuthorsWithId, this));
     menu_.AddAction("ShowBooks"s, {}, "Show books"s, std::bind(&View::ShowBooks, this));
     menu_.AddAction("ShowAuthorBooks"s, {}, "Show author books"s,
                     std::bind(&View::ShowAuthorBooks, this));
