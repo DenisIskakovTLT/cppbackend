@@ -98,7 +98,7 @@ bool View::AddBook(std::istream& cmd_input) const {
             AddBookTags(params->title);
         }
     } catch (const std::exception& e) {
-        output_ << "Failed to add book"sv << e.what() << std::endl;
+        output_ << "Failed to add book"sv << std::endl;
     }
     return true;
 }
@@ -125,9 +125,31 @@ bool View::ShowBooks() const {
 bool View::ShowAuthorBooks() const {
     // TODO: handle error
     try {
-        if (auto author_id = SelectAuthor()) {
-            PrintVector(output_, GetAuthorBooks(*author_id));
+        output_ << "Select author:" << std::endl;
+        auto authors = GetAuthors();
+        PrintVector(output_, authors);
+        output_ << "Enter author # or empty line to cancel" << std::endl;
+
+        std::string str;
+        if (!std::getline(input_, str) || str.empty()) {
+            return true;
         }
+
+        int author_idx;
+        try {
+            author_idx = std::stoi(str);
+        }
+        catch (std::exception const&) {
+            throw std::runtime_error("Invalid author num");
+        }
+
+        --author_idx;
+        if (author_idx < 0 or author_idx >= authors.size()) {
+            throw std::runtime_error("Invalid author num");
+        }
+
+        PrintVector(output_, GetAuthorBooks(authors[author_idx].id));
+        
     } catch (const std::exception&) {
         throw std::runtime_error("Failed to Show Books");
     }

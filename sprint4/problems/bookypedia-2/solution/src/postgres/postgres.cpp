@@ -123,10 +123,17 @@ DELETE FROM book_tags WHERE book_id = ')" + book.GetBookId().ToString() + R"(';)
 
 void AuthorRepositoryImpl::Delete(const domain::Author& author) {
     pqxx::work work{ connection_ };
-    auto q = R"(
-DELETE FROM authors WHERE name = ')" + author.GetName() + R"(';)";
-    
-    work.query(q);
+//    auto q = R"(DELETE FROM authors WHERE name = ')" + author.GetName() + R"(';)";
+    work.exec_params(R"(DELETE FROM authors WHERE name = ')" + author.GetName() + R"(';)");
+
+//        work.exec_params(
+//            R"(
+//INSERT INTO authors (id, name) VALUES ($1, $2)
+//ON CONFLICT (id) DO UPDATE SET name=$2;
+//)"_zv,
+//author.GetId().ToString(), author.GetName());
+
+    //work.query(q);
     work.commit();
 }
 
