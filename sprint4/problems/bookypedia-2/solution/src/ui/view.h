@@ -64,7 +64,6 @@ private:
     std::vector<detail::AuthorInfo> GetAuthors() const;
     std::vector<detail::BookInfo> GetBooks() const;
     std::vector<detail::BookInfo> GetAuthorBooks(const std::string& author_id) const;
-    std::set<std::string> SplitStringByChar(std::string string, char ch) const;
 
     menu::Menu& menu_;
     app::UseCases& use_cases_;

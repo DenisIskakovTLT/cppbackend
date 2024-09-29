@@ -4,6 +4,8 @@
 #include <boost/algorithm/string.hpp>
 #include <cassert>
 #include <iostream>
+#include <iosfwd>
+#include <sstream>
 
 #include "../app/use_cases.h"
 #include "../menu/menu.h"
@@ -158,24 +160,20 @@ std::optional<detail::AddBookParams> View::GetBookParams(std::istream& cmd_input
     }
 
     output_ << "Enter tags (comma separated):" << std::endl;
-    std::string tags_input;
+    std::string tags_input = "";
     std::getline(input_, tags_input);
 
-    //std::istringstream tags_stream(tags_input);
-    //std::string tag;
+    std::istringstream tags_stream(tags_input);
+    std::string tag;
 
     std::set<std::string> tags_set;
-    //while (std::getline(tags_stream, tag, ',')) {
-    //    boost::algorithm::trim(tag);
-    //    if (!tag.empty()) {
-    //        tags_set.insert(tag);
-    //    }
-    //}
-    
-    if (!tags_input.empty()) {
-        tags_set = SplitStringByChar(tags_input, ',');
+    while (std::getline(tags_stream, tag, ',')) {
+        boost::algorithm::trim(tag);
+        if (!tag.empty()) {
+            tags_set.insert(tag);
+        }
     }
-    
+ 
 
     if (!author_id) {
         throw std::runtime_error("Failed to add book: No author selected.");
@@ -190,41 +188,6 @@ std::optional<detail::AddBookParams> View::GetBookParams(std::istream& cmd_input
     }
 }
 
-std::set<std::string> View::SplitStringByChar(std::string string, char ch) const {
-    std::set<std::string> tmpVector;
-    std::string tmpStr;
-    for (auto strCh : string) {
-
-        if (strCh == ch) {
-            size_t strBegin = tmpStr.find_first_not_of(' ');
-            size_t strEnd = tmpStr.find_last_not_of(' ');
-
-            tmpStr.erase(strEnd + 1, string.size() - strEnd);
-            tmpStr.erase(0, strBegin);
-
-            if (tmpStr.empty()) {
-                tmpStr.erase();
-                continue;
-            }
-
-            tmpVector.insert(tmpStr);
-            tmpStr.erase();
-        }
-        else {
-            tmpStr += strCh;
-        }
-    }
-
-    size_t strBegin = tmpStr.find_first_not_of(' ');
-    size_t strEnd = tmpStr.find_last_not_of(' ');
-
-    tmpStr.erase(strEnd + 1, string.size() - strEnd);
-    tmpStr.erase(0, strBegin);
-
-    tmpVector.insert(tmpStr);
-
-    return tmpVector;
-}
 
 std::optional<std::string> View::SelectAuthor() const {
     output_ << "Select author:" << std::endl;
@@ -566,20 +529,18 @@ bool View::EditBook(std::istream& cmd_input) const {
             std::string tags_input;
             std::getline(input_, tags_input);
 
-            //std::istringstream tags_stream(tags_input);
-            //std::string tag;
+            std::istringstream tags_stream(tags_input);
+            std::string tag;
 
             std::set<std::string> tags_set;
-            //while (std::getline(tags_stream, tag, ',')) {
-            //    boost::algorithm::trim(tag);
-            //    if (!tag.empty()) {
-            //        tags_set.insert(tag);
-            //    }
-            //}
-
-            if (!tags_input.empty()) {
-                tags_set = SplitStringByChar(tags_input, ',');
+            while (std::getline(tags_stream, tag, ',')) {
+                boost::algorithm::trim(tag);
+                if (!tag.empty()) {
+                    tags_set.insert(tag);
+                }
             }
+
+
 
             if (!tags_set.empty()) {
                 new_tags.assign(tags_set.begin(), tags_set.end());
