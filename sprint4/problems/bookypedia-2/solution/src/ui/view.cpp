@@ -558,7 +558,8 @@ bool View::EditBook(std::istream& cmd_input) const {
 }
 
 std::optional<int> View::SelectBook(std::vector<detail::BookInfo>& books) const {
-    PrintVector(output_, books);
+    //PrintVector(output_, books);
+    ShowBooks();
     output_ << "Enter the book # or empty line to cancel:" << std::endl;
 
     std::string str;
