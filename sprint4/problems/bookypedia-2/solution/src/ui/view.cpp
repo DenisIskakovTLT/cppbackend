@@ -196,15 +196,16 @@ std::set<std::string> View::SplitStringByChar(std::string string, char ch) const
     for (auto strCh : string) {
 
         if (strCh == ch) {
-            if (tmpStr.empty()) {
-                continue;
-            }
-
             size_t strBegin = tmpStr.find_first_not_of(' ');
             size_t strEnd = tmpStr.find_last_not_of(' ');
 
             tmpStr.erase(strEnd + 1, string.size() - strEnd);
             tmpStr.erase(0, strBegin);
+
+            if (tmpStr.empty()) {
+                tmpStr.erase();
+                continue;
+            }
 
             tmpVector.insert(tmpStr);
             tmpStr.erase();
