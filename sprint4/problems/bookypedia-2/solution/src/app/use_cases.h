@@ -1,5 +1,5 @@
 #pragma once
-
+#include <pqxx/pqxx>
 #include "author.h"
 #include "book.h"
 #include "tags.h"
@@ -26,9 +26,10 @@ public:
     virtual std::set<std::string> GetTagsByBookId(domain::BookId book_id) = 0;
 
     /*Делетеры*/
-    virtual void DeleteAuthor(const std::string& author_id, const std::string& name) = 0;
-    virtual void DeleteTag(const std::string& name) = 0;
+    virtual void DeleteAuthor(const std::string& id, const std::string& name) = 0;
+    virtual void DeleteTag(pqxx::work& work,const std::string& name) = 0;
     virtual void DeleteBook(const domain::Book& book) = 0;
+    virtual void DeleteBookForAuthor(pqxx::work& work, const domain::Book& book) = 0;
     virtual void DeleteAllTagsByBook(const domain::Book& book) = 0;
 
     /*Эдиторы*/

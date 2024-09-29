@@ -36,9 +36,10 @@ namespace domain {
 	class TagRepository {
 	public:
 		virtual void Save(const domain::Tag& tag) = 0;
-		virtual void Delete(const std::string& name) = 0;
+		virtual void Delete(pqxx::work& work, const std::string& name) = 0;
 		virtual void DeleteAllTagsByBook(const domain::Book book) = 0;
 		virtual std::set<std::string> GetTagsByBookId(const BookId& book_id) = 0;
+		virtual std::set<std::string> GetTagsByBookIdInped(pqxx::work& work, const domain::BookId& book_id) = 0;
 	protected:
 		~TagRepository() = default;
 	};

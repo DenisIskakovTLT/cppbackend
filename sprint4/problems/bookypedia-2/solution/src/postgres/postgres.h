@@ -17,8 +17,9 @@ public:
     }
 
     void Save(const domain::Author& author) override;
-    void Delete(const domain::Author& author) override;
+    void Delete(pqxx::work& work, const domain::Author& author) override;
     void Edit(const domain::Author& author, const std::string& new_name) override;
+    void Commit() override;
     std::vector<domain::Author> GetAuthors() override;
     domain::Author GetAuthorById(const domain::AuthorId& id) override;
 private:
@@ -32,7 +33,7 @@ public:
     }
 
     void Save(const domain::Book& book) override;
-    void Delete(const domain::Book& book) override;
+    void Delete(pqxx::work& work,const domain::Book& book) override;
     void Edit(const domain::Book& book, const std::string& new_name) override;
     void EditYear(const domain::BookId& id, const std::string& new_year) override;
     std::vector<domain::Book> GetBooks() override;
@@ -50,10 +51,10 @@ public:
     }
 
     void Save(const domain::Tag& tag) override;
-    void Delete(const std::string& tag) override;
+    void Delete(pqxx::work& work,const std::string& tag) override;
     void DeleteAllTagsByBook(const domain::Book book) override;
-    std::set<std::string> GetTagsByBookId(const domain::BookId& book_id) override;
-
+    std::set<std::string> GetTagsByBookId( const domain::BookId& book_id) override;
+    std::set<std::string> GetTagsByBookIdInped(pqxx::work& work, const domain::BookId& book_id) override;
 private:
     pqxx::connection& connection_;
 };
@@ -74,9 +75,13 @@ public:
         return tags_;
     }
 
+    pqxx::connection& GetConnect() {
+        return connection_;
+    }
+
 private:
     pqxx::connection connection_;
-    AuthorRepositoryImpl authors_{connection_};
+    AuthorRepositoryImpl authors_{ connection_ };
     BookRepositoryImpl books_{ connection_ };
     TagRepositoryImpl tags_{ connection_ };
 };

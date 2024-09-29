@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS book_tags (
     work.commit();
 }
 
-std::set<std::string> TagRepositoryImpl::GetTagsByBookId(const domain::BookId& book_id) {
+std::set<std::string> TagRepositoryImpl::GetTagsByBookId( const domain::BookId& book_id) {
     pqxx::work work{ connection_ };
     std::set<std::string> tmpRes;
     auto q = R"(
@@ -94,22 +94,33 @@ std::set<std::string> TagRepositoryImpl::GetTagsByBookId(const domain::BookId& b
     return tmpRes;
 }
 
-void BookRepositoryImpl::Delete(const domain::Book& book) {
-    pqxx::work work{ connection_ };
+std::set<std::string> TagRepositoryImpl::GetTagsByBookIdInped(pqxx::work& work, const domain::BookId& book_id) {
+    std::set<std::string> tmpRes;
+    auto q = R"(
+            SELECT tag FROM book_tags 
+            WHERE book_id = ')" + book_id.ToString() + R"(' 
+            ;)";
+
+    for (auto [tag] : work.query<std::string>(q)) {
+        tmpRes.insert(tag);
+    }
+
+    return tmpRes;
+}
+
+void BookRepositoryImpl::Delete(pqxx::work& work, const domain::Book& book) {
+
     auto q = R"(
 DELETE FROM books WHERE id = ')" + book.GetBookId().ToString() + R"(';)";
 
     work.query(q);
-    work.commit();
+    //work.commit();
 }
 
-void TagRepositoryImpl::Delete(const std::string& name) {
-    pqxx::work work{ connection_ };
-    auto q = R"(
-DELETE FROM book_tags WHERE tag = ')" + name + R"(';)";
-
-    work.query(q);
-    work.commit();
+void TagRepositoryImpl::Delete(pqxx::work& work, const std::string& name) {
+    work.exec_params(R"(
+DELETE FROM book_tags WHERE tag = ')" + name + R"(';)");
+    //work.commit();
 }
 
 void TagRepositoryImpl::DeleteAllTagsByBook(const domain::Book book) {
@@ -121,12 +132,13 @@ DELETE FROM book_tags WHERE book_id = ')" + book.GetBookId().ToString() + R"(';)
     work.commit();
 }
 
-void AuthorRepositoryImpl::Delete(const domain::Author& author) {
-    pqxx::work work{ connection_ };
-//    auto q = R"(DELETE FROM authors WHERE name = ')" + author.GetName() + R"(';)";
+void AuthorRepositoryImpl::Delete(pqxx::work& work, const domain::Author& author) {
     work.exec_params(R"(DELETE FROM authors WHERE id = ')" + author.GetId().ToString() + R"(';)");
+    //work.commit();
+}
 
-    //work.query(q);
+void AuthorRepositoryImpl::Commit() {
+    pqxx::work work{ connection_ };
     work.commit();
 }
 
@@ -224,6 +236,7 @@ ORDER BY publication_year, title;)";
 
     return res;
 }
+
 
 
 }  // namespace postgres

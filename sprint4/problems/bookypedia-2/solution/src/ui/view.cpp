@@ -345,7 +345,7 @@ bool View::DeleteAutor(std::istream& cmd_input) const {
         size_t strBegin = authorName.find_first_not_of(' ');
         authorName.erase(0, strBegin);
         auto author = GetAuthorByName(authorName);
-        DeleteBooksByAuthorId(author.id);
+        //DeleteBooksByAuthorId(author.id);
         use_cases_.DeleteAuthor(author.id, author.name); //В самую последнюю очередь, т.к. с айди связаны книги и теги
 
 
@@ -357,26 +357,6 @@ bool View::DeleteAutor(std::istream& cmd_input) const {
     return true;
 }
 
-bool View::DeleteBooksByAuthorId(const std::string& author_id) const {
-    auto booksByAuthor = use_cases_.GetBooksByAuthorId(author_id);
-    for (auto book : booksByAuthor) {
-        DeleteTagsByBookId(book.GetBookId().ToString());
-        //Удалить книгу
-        use_cases_.DeleteBook(book);
-    }
-
-    return true;
-}
-
-bool View::DeleteTagsByBookId(const std::string& book_id) const {
-    domain::BookId BookId = domain::BookId::FromString(book_id);
-
-    auto tagsByBook = use_cases_.GetTagsByBookId(BookId);
-    for (auto tag : tagsByBook) {
-        use_cases_.DeleteTag(tag);
-    }
-    return true;
-}
 
 bool View::EditAuthor(std::istream& cmd_input) const {
     try {
@@ -548,7 +528,6 @@ bool View::DeleteBook(std::istream& cmd_input) const {
             }
         }
         //BookId book_id, AuthorId author_id, std::string title, int year
-        DeleteTagsByBookId(book.book_id);
         use_cases_.DeleteBook(domain::Book{domain::BookId::FromString(book.book_id), 
             domain::AuthorId::FromString(GetAuthorByName(book.author_name).id),
             book.title,

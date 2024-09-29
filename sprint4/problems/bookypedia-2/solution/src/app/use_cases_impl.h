@@ -1,4 +1,5 @@
 #pragma once
+#include <pqxx/pqxx>
 #include "../domain/author_fwd.h"
 #include "use_cases.h"
 #include "book.h"
@@ -10,8 +11,8 @@ namespace app {
 
 class UseCasesImpl : public UseCases {
 public:
-    explicit UseCasesImpl(domain::AuthorRepository& authors, domain::BookRepository& books, domain::TagRepository& tags)
-        : authors_{authors}, books_{ books }, tags_(tags) {
+    explicit UseCasesImpl(pqxx::connection& connection, domain::AuthorRepository& authors, domain::BookRepository& books, domain::TagRepository& tags)
+        : connection_(connection), authors_{authors}, books_{ books }, tags_(tags) {
     }
 
     /*Сеттеры*/
@@ -27,8 +28,9 @@ public:
     std::set<std::string> GetTagsByBookId(domain::BookId book_id) override;
 
     /*Делетеры*/
-    void DeleteAuthor(const std::string& author_id, const std::string& name) override;
-    void DeleteTag(const std::string& name) override;
+    void DeleteAuthor(const std::string& id, const std::string& name) override;
+    void DeleteTag(pqxx::work& work,const std::string& name) override;
+    void DeleteBookForAuthor(pqxx::work& work, const domain::Book& book) override;
     void DeleteBook(const domain::Book& book) override;
     void DeleteAllTagsByBook(const domain::Book& book) override;
 
@@ -37,7 +39,10 @@ public:
     void EditBook(const domain::Book& book, const std::string& new_name) override;
     void EditBookYear(const domain::BookId& id, const std::string& new_year) override;
 
+
+
 private:
+    pqxx::connection& connection_;
     domain::AuthorRepository& authors_;
     domain::BookRepository& books_;
     domain::TagRepository& tags_;

@@ -53,10 +53,6 @@ private:
     bool EditAuthor(std::istream& cmd_input) const;
     bool EditBook(std::istream& cmd_input) const;
 
-
-    bool DeleteTagsByBookId(const std::string& book_id) const;
-    bool DeleteBooksByAuthorId(const std::string& author_id) const;
-
     std::optional<detail::AddBookParams> GetBookParams(std::istream& cmd_input) const;
     std::optional<std::string> SelectAuthor() const;
     std::vector<detail::AuthorInfo> GetAuthors() const;

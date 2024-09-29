@@ -2,6 +2,7 @@
 #include "author.h"
 #include "tagged_uuid.h"
 
+#include <pqxx/pqxx>
 #include <set>
 #include <string>
 #include <vector>
@@ -42,7 +43,7 @@ namespace domain {
 	class BookRepository {
 	public:
 		virtual void Save(const Book& book) = 0;
-		virtual void Delete(const Book& book) = 0;
+		virtual void Delete(pqxx::work& work, const Book& book) = 0;
 		virtual void Edit(const domain::Book& book, const std::string& new_name) = 0;
 		virtual void EditYear(const domain::BookId& id, const std::string& new_year) = 0;
 		virtual Book GetBookById(const BookId& id) = 0;

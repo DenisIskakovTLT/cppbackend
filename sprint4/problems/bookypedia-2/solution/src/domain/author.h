@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <optional>
+#include <pqxx/pqxx>
 
 #include "../util/tagged_uuid.h"
 
@@ -37,8 +38,9 @@ private:
 class AuthorRepository {
 public:
     virtual void Save(const Author& author) = 0;
-    virtual void Delete(const Author& author) = 0;
+    virtual void Delete(pqxx::work& work, const Author& author) = 0;
     virtual void Edit(const domain::Author& author, const std::string& new_name) = 0;
+    virtual void Commit() = 0;
     virtual std::vector<Author> GetAuthors() = 0;
     virtual Author GetAuthorById(const AuthorId& id) = 0;
 
