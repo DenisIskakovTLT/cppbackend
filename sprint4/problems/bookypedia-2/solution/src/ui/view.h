@@ -20,6 +20,7 @@ struct AddBookParams {
     std::string title;
     std::string author_id;
     int publication_year = 0;
+    std::vector<std::string> tags;
 };
 
 struct AuthorInfo {
@@ -29,9 +30,10 @@ struct AuthorInfo {
 
 struct BookInfo {
     std::string title;
-    int publication_year;
+    std::string uid;
     std::string author_name;
-    std::string book_id;
+    int publication_year;
+    std::vector<std::string> tags;
 };
 
 }  // namespace detail
@@ -42,29 +44,27 @@ public:
 
 private:
     bool AddAuthor(std::istream& cmd_input) const;
-    bool AddBook(std::istream& cmd_input) const;
     bool ShowAuthors() const;
-    bool ShowAuthorsWithId() const;
+    bool ShowAuthorBooks() const;
+    bool DeleteAuthor(std::istream& cmd_input) const;
+    bool EditAuthor(std::istream& cmd_input) const;
+
+    bool AddBook(std::istream& cmd_input) const;
+    bool DeleteBook(std::istream& cmd_input) const;
     bool ShowBooks() const;
     bool ShowBook(std::istream& cmd_input) const;
-    bool ShowAuthorBooks() const;
-    bool DeleteAutor(std::istream& cmd_input) const;
-    bool DeleteBook(std::istream& cmd_input) const;
-    bool EditAuthor(std::istream& cmd_input) const;
     bool EditBook(std::istream& cmd_input) const;
 
     std::optional<detail::AddBookParams> GetBookParams(std::istream& cmd_input) const;
+    std::optional<int> SelectBook(std::vector<detail::BookInfo>& authors_info) const;
     std::optional<std::string> SelectAuthor() const;
+    std::optional<std::string> SelectAuthor(std::vector<detail::AuthorInfo>& authors_info) const;
+    std::optional<std::string> GetAuthorIdByName(const std::string& author_name) const;
+    std::optional<std::string> GetAuthorIdByName(const std::string& author_name, std::vector<detail::AuthorInfo>& authors_info) const;
     std::vector<detail::AuthorInfo> GetAuthors() const;
     std::vector<detail::BookInfo> GetBooks() const;
     std::vector<detail::BookInfo> GetAuthorBooks(const std::string& author_id) const;
-    std::string GetNameByAuthorId(const std::string& author_id) const;
-
-    ui::detail::AuthorInfo GetAuthorByName(const std::string& authorName) const;
-    std::vector<ui::detail::BookInfo>  GetBookByName(const std::string& bookName) const;
-    void AddBookTags(std::string book_name) const;
     std::set<std::string> SplitStringByChar(std::string string, char ch) const;
-    void PrintAllAboutABook(ui::detail::BookInfo book) const;
 
     menu::Menu& menu_;
     app::UseCases& use_cases_;

@@ -1,9 +1,7 @@
 #pragma once
-#include <pqxx/pqxx>
 #include "../domain/author_fwd.h"
 #include "use_cases.h"
 #include "book.h"
-#include "tags.h"
 
 #include <optional>
 
@@ -11,41 +9,31 @@ namespace app {
 
 class UseCasesImpl : public UseCases {
 public:
-    explicit UseCasesImpl(pqxx::connection& connection, domain::AuthorRepository& authors, domain::BookRepository& books, domain::TagRepository& tags)
-        : connection_(connection), authors_{authors}, books_{ books }, tags_(tags) {
+    explicit UseCasesImpl(domain::AuthorRepository& authors, domain::BookRepository& books)
+        : authors_{authors}, books_{ books } {
     }
 
     /*Сеттеры*/
     void AddAuthor(const std::string& name) override;
-    void AddBook(const std::string& author_id, const std::string& title, int publication_year) override;
-    void AddTags(const domain::BookId& id, const std::string& tag) override;
+    void AddBook(const std::string& author_id, const std::string& title, int publication_year, std::vector<std::string> tags) override;
 
     /*Геттеры*/
     std::vector<domain::Author> GetAuthors() override;
-    std::vector<domain::Book> GetBooks() override;
+    std::vector<std::pair<domain::Book, std::string>> GetBooks() override;
     std::vector<domain::Book> GetBooksByAuthorId(const std::string& author_id) override;
-    domain::Author GetAuthorsByAuthorId(const std::string& author_id) override;
-    std::set<std::string> GetTagsByBookId(domain::BookId book_id) override;
-
-    /*Делетеры*/
-    void DeleteAuthor(const std::string& id, const std::string& name) override;
-    void DeleteTag(pqxx::work& work,const std::string& name) override;
-    void DeleteBookForAuthor(pqxx::work& work, const domain::Book& book) override;
-    void DeleteBook(const domain::Book& book) override;
-    void DeleteAllTagsByBook(const domain::Book& book) override;
 
     /*Эдиторы*/
-    void EditAuthor(const domain::Author& author, const std::string& new_name) override;
-    void EditBook(const domain::Book& book, const std::string& new_name) override;
-    void EditBookYear(const domain::BookId& id, const std::string& new_year) override;
+    void EditAuthor(const std::string& author_id, const std::string& new_name) override;
+    void EditBook(const std::string& book_id, const std::optional<std::string>& new_title,
+        const std::optional<int>& new_pub_year, const std::vector<std::string>& new_tags) override;
 
-
+    /*Делетеры*/
+    void DeleteAuthor(const std::string& author_id) override;
+    void DeleteBook(const std::string& book_id) override;
 
 private:
-    pqxx::connection& connection_;
     domain::AuthorRepository& authors_;
     domain::BookRepository& books_;
-    domain::TagRepository& tags_;
 };
 
 }  // namespace app

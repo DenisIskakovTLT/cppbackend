@@ -17,11 +17,12 @@ std::vector<domain::Author> UseCasesImpl::GetAuthors() {
     return authors_.GetAuthors();
 }
 
-void UseCasesImpl::AddBook(const std::string& author_id, const std::string& title, int publication_year) {
-    books_.Save({ BookId::New(), AuthorId::FromString(author_id), title, publication_year });
+void UseCasesImpl::AddBook(const std::string& author_id, const std::string& title, int publication_year, std::vector<std::string> tags) {
+    auto author_id_obj = domain::AuthorId::FromString(author_id);
+    books_.Save({ BookId::New(), author_id_obj, title, publication_year , tags });
 }
 
-std::vector<domain::Book> UseCasesImpl::GetBooks() {
+std::vector<std::pair<domain::Book, std::string>> UseCasesImpl::GetBooks() {
     return books_.GetBooks();
 }
 
@@ -29,66 +30,21 @@ std::vector<domain::Book> UseCasesImpl::GetBooksByAuthorId(const std::string& au
     return books_.GetBooksByAuthorId(AuthorId::FromString(author_id));
 }
 
-void UseCasesImpl::AddTags(const domain::BookId& id, const std::string& tag) {
-    tags_.Save({ TagId::New(), id , tag });
+void UseCasesImpl::DeleteAuthor(const std::string& author_id) {
+    authors_.Delete(domain::AuthorId::FromString(author_id));
 }
 
-void UseCasesImpl::DeleteTag(pqxx::work& work,const std::string& name) {
-    tags_.Delete(work, name );
+void UseCasesImpl::EditAuthor(const std::string& author_id, const std::string& new_name) {
+    authors_.Edit(domain::AuthorId::FromString(author_id), new_name);
 }
 
-domain::Author UseCasesImpl::GetAuthorsByAuthorId(const std::string& author_id) {
-    return authors_.GetAuthorById(AuthorId::FromString(author_id));
+void UseCasesImpl::DeleteBook(const std::string& book_id) {
+    books_.Delete(domain::BookId::FromString(book_id));
 }
 
-std::set<std::string> UseCasesImpl::GetTagsByBookId(domain::BookId book_id) {
-    return tags_.GetTagsByBookId(book_id);
-}
-
-void UseCasesImpl::DeleteBook(const domain::Book& book) {
-    pqxx::work work{ connection_ };
-    DeleteBookForAuthor(work, book);
-    work.commit();
-}
-
-void UseCasesImpl::EditAuthor(const domain::Author& author, const std::string& new_name) {
-    authors_.Edit(author, new_name);
-}
-
-void UseCasesImpl::EditBook(const domain::Book& book, const std::string& new_name) {
-    books_.Edit(book, new_name);
-}
-
-void UseCasesImpl::EditBookYear(const domain::BookId& id, const std::string& new_year) {
-    books_.EditYear(id, new_year);
-}
-
-void UseCasesImpl::DeleteAllTagsByBook(const domain::Book& book) {
-    tags_.DeleteAllTagsByBook(book);
-}
-
-void UseCasesImpl::DeleteAuthor(const std::string& id, const std::string& name) {
-
-    auto books = books_.GetBooksByAuthorId(domain::AuthorId::FromString(id));
-    auto author = authors_.GetAuthorById(domain::AuthorId::FromString(id));
-
-    pqxx::work work{ connection_ };
-    for (const auto& book : books)
-    {
-        DeleteBookForAuthor(work, book);
-
-    }
-    authors_.Delete(work, author);
-    work.commit();
-}
-
-void UseCasesImpl::DeleteBookForAuthor(pqxx::work& work, const domain::Book& book) {
-
-    auto tags = tags_.GetTagsByBookIdInped(work, book.GetBookId());
-    for (const auto& tag : tags) {
-        DeleteTag(work ,tag);
-    }
-    books_.Delete(work, book);
+void UseCasesImpl::EditBook(const std::string& book_id, const std::optional<std::string>& new_title,
+    const std::optional<int>& new_pub_year, const std::vector<std::string>& new_tags) {
+    books_.Edit(domain::BookId::FromString(book_id), new_title, new_pub_year, new_tags);
 }
 
 }  // namespace app

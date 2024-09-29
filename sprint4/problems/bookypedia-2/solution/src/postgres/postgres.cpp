@@ -24,219 +24,258 @@ ON CONFLICT (id) DO UPDATE SET name=$2;
     work.commit();
 }
 
+void AuthorRepositoryImpl::Delete(const domain::AuthorId& author_id) {
+    pqxx::work work{ connection_ , "serializable" };
+
+    try {
+        work.exec_params(
+            R"(
+            DELETE FROM book_tags
+            WHERE book_id IN (
+                SELECT id FROM books WHERE author_id = $1
+            );
+            )", author_id.ToString()
+        );
+
+        work.exec_params(
+            R"(
+            DELETE FROM books WHERE author_id = $1;
+            )", author_id.ToString()
+        );
+
+        auto result = work.exec_params(
+            R"(
+            DELETE FROM authors WHERE id = $1;
+            )", author_id.ToString()
+        );
+
+        if (result.affected_rows() == 0) {
+            throw std::runtime_error("Author not found");
+        }
+
+        work.commit();
+    }
+    catch (const std::exception& e) {
+        work.abort();
+        throw std::runtime_error("Failed to delete author");
+    }
+}
+
+void AuthorRepositoryImpl::Edit(const domain::AuthorId& author_id, const std::string& new_name) {
+    pqxx::work work{ connection_ , "serializable" };
+
+    try {
+        auto result = work.exec_params(
+            "UPDATE authors SET name = $2 WHERE id = $1",
+            author_id.ToString(), new_name
+        );
+
+        if (result.affected_rows() == 0) {
+            throw std::runtime_error("Author not found");
+        }
+
+        work.commit();
+    }
+    catch (const std::exception& e) {
+        work.abort();
+        throw std::runtime_error("Failed to edit author");
+    }
+}
+
 void BookRepositoryImpl::Save(const domain::Book& book) {
-    pqxx::work work{ connection_ };
-    /*https://habr.com/ru/articles/264281/ используем ON CONFLICT, при одинаковых айди заменит содержимое*/
-    work.exec_params(
+    pqxx::work work{ connection_ , "serializable" };
+    try {
+        work.exec_params(
+            "INSERT INTO books (id, title, author_id, publication_year) VALUES ($1, $2, $3, $4)",
+            book.GetBookId().ToString(), book.GetTitle(), book.GetAuthorId().ToString(), book.GetPublicationYear());
+
+        auto tags = book.GetTags();
+
+        if (!tags.empty()) {
+            for (const auto& tag : tags) {
+                work.exec_params(
+                    "INSERT INTO book_tags (book_id, tag) VALUES ($1, $2)",
+                    book.GetBookId().ToString(), tag);
+            }
+        }
+
+        work.commit();
+    }
+    catch (const std::exception& e) {
+        work.abort();
+        throw std::runtime_error("Failed to add book");
+    }
+}
+
+std::vector<std::pair<domain::Book, std::string>> BookRepositoryImpl::GetBooks() {
+    pqxx::work work{ connection_ , "serializable" };
+    auto result = work.exec(
         R"(
-INSERT INTO books (id, author_id, title, publication_year) VALUES ($1, $2, $3, $4)
-ON CONFLICT (id) DO UPDATE SET author_id=$2, title=$3, publication_year=$4;
-)"_zv,
-book.GetBookId().ToString(), book.GetAuthorId().ToString(), book.GetTitle(), book.GetPublicationYear());
-    work.commit();
-}
+        SELECT b.id, b.title, b.author_id, b.publication_year, a.name as author_name
+        FROM books b
+        JOIN authors a ON b.author_id = a.id
+        ORDER BY b.title, a.name, b.publication_year
+        )"
+    );
 
-void TagRepositoryImpl::Save(const domain::Tag& tag) {
-    pqxx::work work{ connection_ };
+    std::vector<std::pair<domain::Book, std::string>> books;
+    for (size_t i = 0; i < result.size(); ++i) {
+        const auto& row = result[i];
 
-    work.exec_params(R"(INSERT INTO book_tags (id, book_id, tag) VALUES ($1, $2, $3)
-ON CONFLICT (id) DO UPDATE SET book_id=$2, tag=$3;
-)"_zv, 
-tag.GetTagId().ToString(), tag.GetBookId().ToString(), tag.GetTag());
-    work.commit();
-    
-    
-}
+        domain::BookId book_id = domain::BookId::FromString(row["id"].as<std::string>());
 
-Database::Database(pqxx::connection connection)
-    : connection_{std::move(connection)} {
-    pqxx::work work{connection_};
-    work.exec(R"(
-CREATE TABLE IF NOT EXISTS authors (
-    id UUID CONSTRAINT author_id_constraint PRIMARY KEY,
-    name varchar(100) UNIQUE NOT NULL
-);
-)"_zv);
-    // ... создать другие таблицы   
-    /*REFERENCES связывает таблицы в данном случае authors https://metanit.com/sql/postgresql/2.5.php*/
-    work.exec(R"(
-CREATE TABLE IF NOT EXISTS books (
-    id UUID CONSTRAINT book_id_constraint PRIMARY KEY,
-    author_id UUID NOT NULL REFERENCES authors(id),                     
-    title varchar(100) NOT NULL,
-    publication_year INTEGER
-);
-)"_zv);
+        auto tags_result = work.exec_params(
+            R"(
+            SELECT tag FROM book_tags WHERE book_id = $1 ORDER BY tag
+            )", book_id.ToString()
+        );
 
-    work.exec(R"(
-CREATE TABLE IF NOT EXISTS book_tags (
-    id UUID CONSTRAINT tag_id_constraint PRIMARY KEY, 
-    book_id UUID NOT NULL REFERENCES books(id),
-    tag varchar(30) NOT NULL);
-)"_zv);
+        std::vector<std::string> tags;
+        for (size_t i = 0; i < tags_result.size(); ++i) {
+            tags.push_back(tags_result[i]["tag"].as<std::string>());
+        }
 
-    // коммитим изменения
-    work.commit();
-}
-
-std::set<std::string> TagRepositoryImpl::GetTagsByBookId( const domain::BookId& book_id) {
-    pqxx::work work{ connection_ };
-    std::set<std::string> tmpRes;
-    auto q = R"(
-            SELECT tag FROM book_tags 
-            WHERE book_id = ')" + book_id.ToString() + R"(' 
-            ;)";
-
-    for (auto [tag] : work.query<std::string>(q)) {
-        tmpRes.insert(tag);
+        books.emplace_back(
+            domain::Book{
+                book_id,
+                domain::AuthorId::FromString(row["author_id"].as<std::string>()),
+                row["title"].as<std::string>(),
+                row["publication_year"].as<int>(),
+                std::move(tags)
+            },
+            row["author_name"].as<std::string>()
+        );
     }
 
-    return tmpRes;
+
+    return books;
 }
 
-std::set<std::string> TagRepositoryImpl::GetTagsByBookIdInped(pqxx::work& work, const domain::BookId& book_id) {
-    std::set<std::string> tmpRes;
-    auto q = R"(
-            SELECT tag FROM book_tags 
-            WHERE book_id = ')" + book_id.ToString() + R"(' 
-            ;)";
+void BookRepositoryImpl::Edit(const domain::BookId& book_id, const std::optional<std::string>& new_title,
+    const std::optional<int>& new_pub_year, const std::vector<std::string>& new_tags) {
+    pqxx::work work{ connection_, "serializable" };
 
-    for (auto [tag] : work.query<std::string>(q)) {
-        tmpRes.insert(tag);
+    try {
+        if (new_title.has_value() && !new_title.value().empty()) {
+            work.exec_params(
+                "UPDATE books SET title = $2 WHERE id = $1",
+                book_id.ToString(), new_title.value()
+            );
+        }
+
+        if (new_pub_year.has_value()) {
+            work.exec_params(
+                "UPDATE books SET publication_year = $2 WHERE id = $1",
+                book_id.ToString(), new_pub_year.value()
+            );
+        }
+
+        work.exec_params(
+            "DELETE FROM book_tags WHERE book_id = $1",
+            book_id.ToString()
+        );
+
+        if (!new_tags.empty()) {
+            for (const auto& tag : new_tags) {
+                work.exec_params(
+                    "INSERT INTO book_tags (book_id, tag) VALUES ($1, $2)",
+                    book_id.ToString(), tag
+                );
+            }
+        }
+
+        work.commit();
     }
-
-    return tmpRes;
-}
-
-void BookRepositoryImpl::Delete(pqxx::work& work, const domain::Book& book) {
-
-    auto q = R"(
-DELETE FROM books WHERE id = ')" + book.GetBookId().ToString() + R"(';)";
-
-    work.query(q);
-    //work.commit();
-}
-
-void TagRepositoryImpl::Delete(pqxx::work& work, const std::string& name) {
-    work.exec_params(R"(
-DELETE FROM book_tags WHERE tag = ')" + name + R"(';)");
-    //work.commit();
-}
-
-void TagRepositoryImpl::DeleteAllTagsByBook(const domain::Book book) {
-    pqxx::work work{ connection_ };
-    auto q = R"(
-DELETE FROM book_tags WHERE book_id = ')" + book.GetBookId().ToString() + R"(';)";
-
-    work.query(q);
-    work.commit();
-}
-
-void AuthorRepositoryImpl::Delete(pqxx::work& work, const domain::Author& author) {
-    work.exec_params(R"(DELETE FROM authors WHERE id = ')" + author.GetId().ToString() + R"(';)");
-    //work.commit();
-}
-
-void AuthorRepositoryImpl::Commit() {
-    pqxx::work work{ connection_ };
-    work.commit();
-}
-
-void AuthorRepositoryImpl::Edit(const domain::Author& author, const std::string& new_name) {
-    pqxx::work work{ connection_ };
-    auto q = R"(
-UPDATE authors SET name = ')" + new_name + R"(' WHERE name = ')" + author.GetName() + R"(';)";
-
-    work.query(q);
-    work.commit();
-}
-
-void BookRepositoryImpl::EditYear(const domain::BookId& id, const std::string& new_year) {
-    pqxx::work work{ connection_ };
-    auto q = R"(
-UPDATE books SET publication_year = ')" + new_year + R"(' WHERE id = ')" + id.ToString() + R"(';)";
-
-    work.query(q);
-    work.commit();
-}
-
-void BookRepositoryImpl::Edit(const domain::Book& book, const std::string& new_name) {
-    pqxx::work work{ connection_ };
-    auto q = R"(
-UPDATE books SET title = ')" + new_name + R"(' WHERE title = ')" + book.GetTitle() + R"(';)";
-
-    work.query(q);
-    work.commit();
-}
-
-domain::Author AuthorRepositoryImpl::GetAuthorById(const domain::AuthorId& id) {
-    pqxx::read_transaction transact(connection_);
-    auto q = R"(
-            SELECT name FROM authors 
-            WHERE id = ')" + id.ToString() + R"(' 
-            LIMIT 1;)";
-
-    auto [name] = transact.query1<std::string>(q);      //Используем query1, возвращает только одну строку
-
-    return domain::Author{ id, name };
-}
-
-std::vector<domain::Author> AuthorRepositoryImpl::GetAuthors() {
-    pqxx::read_transaction transact(connection_);
-    auto q = R"(SELECT id, name FROM authors ORDER BY name;)";
-
-    std::vector<domain::Author> tmpRes;
-
-    for (auto [id, name] : transact.query<std::string, std::string>(q)) {
-        tmpRes.emplace_back(domain::Author{ domain::AuthorId::FromString(id), name });
+    catch (const std::exception& e) {
+        work.abort();
+        throw std::runtime_error("Failed to edit book");
     }
-
-    return tmpRes;
 }
 
-domain::Book BookRepositoryImpl::GetBookById(const domain::BookId& id) {
-    pqxx::read_transaction transact(connection_);
-    auto q = R"(
-SELECT author_id, title, publication_year FROM books 
-WHERE id = )" + transact.quote(id.ToString()) + R"( 
-LIMIT 1;)";
+void BookRepositoryImpl::Delete(const domain::BookId& book_id) {
+    pqxx::work work{ connection_ , "serializable" };
 
-    auto [author_id, title, year] = transact.query1<std::string, std::string, int>(q);
+    try {
+        work.exec_params(
+            "DELETE FROM book_tags WHERE book_id = $1",
+            book_id.ToString()
+        );
 
-    return domain::Book{ id, domain::AuthorId::FromString(author_id), title, year };
-}
+        work.exec_params(
+            "DELETE FROM books WHERE id = $1",
+            book_id.ToString()
+        );
 
-std::vector<domain::Book> BookRepositoryImpl::GetBooks() {
-    pqxx::read_transaction transact(connection_);
-    auto q = R"(
-SELECT id, author_id, title, publication_year FROM books 
-ORDER BY title;)";
-
-    std::vector<domain::Book> tmpRes;
-
-    for (auto [id, author_id, title, year] : transact.query<std::string, std::string, std::string, int>(q)) {
-        tmpRes.emplace_back(domain::Book{ domain::BookId::FromString(id), domain::AuthorId::FromString(author_id), title, year });
+        work.commit();
     }
-
-    return tmpRes;
+    catch (const std::exception& e) {
+        work.abort();
+        throw std::runtime_error("Failed to delete book");
+    }
 }
 
 std::vector<domain::Book> BookRepositoryImpl::GetBooksByAuthorId(const domain::AuthorId& author_id) {
-    pqxx::read_transaction transact(connection_);
-    auto q = R"(
-SELECT id, author_id, title, publication_year FROM books 
-WHERE author_id = )" + transact.quote(author_id .ToString()) + R"( 
-ORDER BY publication_year, title;)";
+    pqxx::work work{ connection_ , "serializable" };
+    auto result = work.exec_params("SELECT id, title, author_id, publication_year FROM books WHERE author_id = $1 ORDER BY publication_year, title",
+        author_id.ToString());
 
-    std::vector<domain::Book> res;
-
-    for (auto [id, author_id, title, year] : transact.query<std::string, std::string, std::string, int>(q)) {
-        res.emplace_back(domain::Book{ domain::BookId::FromString(id), domain::AuthorId::FromString(author_id), title, year });
+    std::vector<domain::Book> books;
+    for (size_t i = 0; i < result.size(); ++i) {
+        const auto& row = result[i];
+        books.push_back({
+            domain::BookId::FromString(row["id"].as<std::string>()),
+            domain::AuthorId::FromString(row["author_id"].as<std::string>()),
+            row["title"].as<std::string>(),
+            row["publication_year"].as<int>(), {}
+            });
     }
 
-    return res;
+    return books;
 }
 
+Database::Database(pqxx::connection connection)
+    : connection_{ std::move(connection) } {
+    pqxx::work work{ connection_ };
+    work.exec(R"(
+CREATE TABLE IF NOT EXISTS authors (
+    id UUID PRIMARY KEY,
+    name VARCHAR(100) UNIQUE NOT NULL
+);
+)"_zv);
+    work.exec(R"(
+CREATE TABLE IF NOT EXISTS books (
+    id UUID PRIMARY KEY,
+    author_id UUID NOT NULL,
+    title VARCHAR(100) NOT NULL,
+    publication_year INT NOT NULL,
+    FOREIGN KEY (author_id) REFERENCES authors (id)
+);
+)"_zv);
+    work.exec(R"(
+CREATE TABLE IF NOT EXISTS book_tags (
+    book_id UUID NOT NULL,
+    tag VARCHAR(30) NOT NULL,
+    FOREIGN KEY (book_id) REFERENCES books (id)
+);
+)"_zv);
+    work.commit();
+}
+
+std::vector<domain::Author> AuthorRepositoryImpl::GetAuthors() {
+    pqxx::work work{ connection_ , "serializable" };
+    auto result = work.exec("SELECT id, name FROM authors ORDER BY name");
+
+    std::vector<domain::Author> tmpRes;
+    for (size_t i = 0; i < result.size(); ++i) {
+        const auto& row = result[i];
+        tmpRes.push_back({
+            domain::AuthorId::FromString(row["id"].as<std::string>()),
+            row["name"].as<std::string>()
+            });
+    }
+
+    return tmpRes;
+}
 
 
 }  // namespace postgres

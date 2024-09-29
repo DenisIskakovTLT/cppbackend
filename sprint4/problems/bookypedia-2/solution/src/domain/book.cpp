@@ -17,4 +17,8 @@ namespace domain {
 	int Book::GetPublicationYear() const noexcept {
 		return publication_year_;
 	}
+
+	const std::vector<std::string>& Book::GetTags() const noexcept {
+		return tags_;
+	}
 }
