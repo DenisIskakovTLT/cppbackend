@@ -103,9 +103,9 @@ add_executable(game_server
 	src/ServerLayer/server/http_server.h
 	src/InterLayer/ticker/ticker.h
 	src/InterLayer/ticker/ticker.cpp
-	src/InterLayer/postgres/use_case_impl.h
-	src/InterLayer/postgres/use_case_impl.cpp
-	src/InterLayer/postgres/use_case.h
+	src/InterLayer/postgres/use_cases_impl.h
+	src/InterLayer/postgres/use_cases_impl.cpp
+	src/InterLayer/postgres/use_cases.h
 	src/InterLayer/postgres/postgres.cpp
 	src/InterLayer/postgres/postgres.h
 	src/InterLayer/postgres/connection_pool.h
