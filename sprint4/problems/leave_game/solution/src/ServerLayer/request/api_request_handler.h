@@ -512,7 +512,7 @@ namespace requestHandler {
 
     template <typename Request>
     bool GetRecordsCheck(const Request& req) {
-        return (req.target() == "/api/v1/game/records/" || req.target() == "/api/v1/game/records");
+        return (boost::urls::url_view{ req.target() }.path() == "/api/v1/game/records/" || boost::urls::url_view{ req.target() }.path() == "/api/v1/game/records");
     }
 
     template <typename Request, typename Send>
