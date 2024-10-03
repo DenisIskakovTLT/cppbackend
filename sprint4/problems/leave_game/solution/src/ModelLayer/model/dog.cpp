@@ -48,7 +48,7 @@ namespace model {
 
     void Dog::Move(Direction direction, double speed) {
 
-        if (direction == Direction::UNKNOWN) {
+        if (direction != Direction::UNKNOWN) {
             downTime_ = std::chrono::milliseconds{0};    //сбрасываем врмя простоя
         }
 
