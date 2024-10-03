@@ -25,25 +25,20 @@ namespace app {
 
 
         void SetGameSession(std::shared_ptr<GameSession> session);          //Задать игровую сессию
-        void SetDog(const std::string& dog_name, 
-                    const model::Map& map, 
-                    bool randomize_spawn_points);                           //Сеттер собаки
         void SetDog(std::shared_ptr<model::Dog> dog);                       //Сеттер не новой собаки
 
         const Id& GetId() const;                                            //Геттер на айди
         const std::string& GetName() const;                                 //Геттер на имя
         const GameSession::Id& GetSessionId() const;                        //Геттер на сессию
         std::shared_ptr<GameSession> GetSession();                          //Геттер на сессию указатель
-        std::shared_ptr<model::Dog> GetDog();                                 //Геттер на собаку
+        std::shared_ptr<model::Dog> GetDog();                               //Геттер на собаку
 
     private:
-        void PutDogInRndPosition(const model::Map& map);                    //Разместить на рандомной позиции собаку
-        void PutDogInStartPosition(const model::Map& map);                  //Разместить на переданной позиции собаку
 
         Id id_;                                                             //айди
         std::string name_;                                                  //имя
         std::shared_ptr<GameSession> session_;                              //сессия в игре
-        std::shared_ptr<model::Dog> dog_;                                     //собака игрока
+        std::shared_ptr<model::Dog> dog_;                                   //собака игрока
     };
 
 }

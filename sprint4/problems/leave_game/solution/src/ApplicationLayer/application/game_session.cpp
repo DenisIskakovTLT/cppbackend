@@ -187,4 +187,22 @@ namespace app {
     void GameSession::SetSaveDataToPostgresFunctional(std::function<void(const std::vector<PlayerDataForPostgres>&)> func) {
         SaveDataToPostgres_signal.connect(func);
     }
+
+    std::shared_ptr<model::Dog> GameSession::MakeDog(const std::string& name,
+        const model::Map& map,
+        bool randomizePosition) {
+        auto tmpDog = std::make_shared<model::Dog>(name, map_->GetDogBagSize());
+
+        if (randomizePosition) {
+            tmpDog->SetPosition(map_->GenerateRndPosition());
+        }
+        else {
+            auto roads = map_->GetRoads();
+            auto road = roads[0];
+            tmpDog->SetPosition({ static_cast<double>(road.GetStart().x), static_cast<double>(road.GetStart().y) });
+        }
+        dogs_[tmpDog->GetId()] = tmpDog;
+
+        return tmpDog;
+    }
 }

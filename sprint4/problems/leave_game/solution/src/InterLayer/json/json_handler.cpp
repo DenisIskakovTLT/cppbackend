@@ -58,11 +58,11 @@ namespace jsonOperation {
         return boost::json::serialize(msg);
     };
 
-    std::string PlayersListOnMap(const std::vector< std::weak_ptr<app::Player> >& players) {
+    std::string PlayersListOnMap(const std::vector< std::shared_ptr<app::Player> >& players) {
         boost::json::value jv;
         boost::json::object& obj = jv.emplace_object();
         for (auto item : players) {
-            auto player = item.lock();
+            auto player = item;
             std::stringstream ss;
             ss << *(player->GetId());
             boost::json::value jv_item = { {RESPONSE_NAME, player->GetName()} };
@@ -113,13 +113,13 @@ namespace jsonOperation {
         }
     };
 
-    std::string GameState(const std::vector< std::weak_ptr<app::Player> >& players, const app::GameSession::lostObjectsId lostObjects) {
+    std::string GameState(const std::vector< std::shared_ptr<app::Player> >& players, const app::GameSession::lostObjectsId lostObjects) {
         boost::json::value jv;
         boost::json::object objPLayers;
         boost::json::object objLost;
         boost::json::object tmpRes;
         for (auto item : players) {
-            auto player = item.lock();
+            auto player = item;
             auto dog = player->GetDog();
             std::stringstream ss;
             ss << *(player->GetId());

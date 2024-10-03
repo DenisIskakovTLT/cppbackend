@@ -50,7 +50,6 @@ namespace model {
 
         if (direction == Direction::UNKNOWN) {
             downTime_ = std::chrono::milliseconds{0};    //сбрасываем врмя простоя
-
         }
 
         switch (direction) {

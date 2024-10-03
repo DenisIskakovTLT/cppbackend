@@ -30,33 +30,42 @@ namespace app {
             AddGameSession(session);
             session->StartGame();
         }
-        tokenToSessionIndex_[token] = session;
-        sessionToTokenPlayer_[session][token] = player;
         BindPlayerInSession(player, session);
+        sessionToTokenPlayer_[session->GetId()][token] = player->GetId();
         return std::tie(token, player->GetId());
     };
 
     std::shared_ptr<Player> Application::CreatePlayer(const std::string& player_name) {
         auto player = std::make_shared<Player>(player_name);
-        players_.push_back(player);
+        players_[player->GetId()] = player;
         return player;
     };
 
     void Application::BindPlayerInSession(std::shared_ptr<Player> player,
         std::shared_ptr<GameSession> session) {
-        sessionID_[session->GetId()].push_back(player);
         player->SetGameSession(session);
-        player->SetDog(player->GetName(), *(session->GetMap()), randomizePosition_);
+        auto tmpDog = session->MakeDog(player->GetName(), *(session->GetMap()), randomizePosition_);
+        player->SetDog(tmpDog);
     };
 
-    const std::vector< std::weak_ptr<Player> >& Application::GetPlayersFromSession(auth::Token token) {
-        static const std::vector< std::weak_ptr<Player> > emptyPlayerList;
+    std::vector< std::shared_ptr<Player>> Application::GetPlayersFromSession(auth::Token token) {
+        std::vector< std::shared_ptr<Player> > emptyPlayerList;
         auto player = playerTokens_.FindPlayerByToken(token).lock();
-        auto session_id = player->GetSessionId();
-        if (!sessionID_.contains(session_id)) {
+        if (!player) {
             return emptyPlayerList;
         }
-        return sessionID_[session_id];
+        auto playerSession = player->GetSessionId();
+        if (!sessionToTokenPlayer_.contains(playerSession)) {
+            return emptyPlayerList;
+        }
+
+        for (const auto& [token, playerId] : sessionToTokenPlayer_[playerSession]) {
+            if (players_.contains(playerId)) {
+                emptyPlayerList.push_back(players_[playerId]);
+            }
+        }
+
+        return emptyPlayerList;
     };
 
     bool Application::CheckPlayerByToken(auth::Token token) {
@@ -67,7 +76,7 @@ namespace app {
     При автоматическом управлении апдейтер будет вызывать тикер игры, а сохранения тикер сохранений*/
     void Application::UpdateGameState(const std::chrono::milliseconds& time) {
 
-        for (auto session: sessions_) {
+        for (auto [id, session] : sessions_) {
             session->UpdateGameState(time);
         }
 
@@ -86,13 +95,13 @@ namespace app {
     };
 
     void Application::AddGameSession(std::shared_ptr<GameSession> session) {
-        const size_t index = sessions_.size();
-        if (auto [it, inserted] = mapIdToSessionIndex_.emplace(session->GetMap()->GetId(), index); !inserted) {
+        
+        if (auto [it, inserted] = mapIdToSessionIndex_.emplace(session->GetMap()->GetId(), session->GetId()); !inserted) {
             throw std::invalid_argument("Game session with map id "s + *(session->GetMap()->GetId()) + " already exists"s);
         }
         else {
             try {
-                sessions_.push_back(session);
+                sessions_[session->GetId()] = session;
             }
             catch (...) {
                 mapIdToSessionIndex_.erase(it);
@@ -120,8 +129,10 @@ namespace app {
     };
 
     std::shared_ptr<GameSession> Application::GetGameSessionByToken(const auth::Token& token) const noexcept {
-        if (auto it = tokenToSessionIndex_.find(token); it != tokenToSessionIndex_.end()) {
-            return it->second;
+        for (const auto& [id, tokPlay] : sessionToTokenPlayer_) {
+            if (tokPlay.contains(token)) {
+                return sessions_.at(id);
+            }
         }
         return nullptr;
     }
@@ -145,9 +156,14 @@ namespace app {
     std::vector<serialization::GameSessionRepr> Application::SerializeGame() {
 
         std::vector<serialization::GameSessionRepr> serializedSession_;        //Сюда будем наполнять сериализированные данные
+        for(const auto& [id, session] : sessions_){
+            std::unordered_map < auth::Token, std::shared_ptr<app::Player>, auth::TokenHasher> tokenPlayer;
 
-        for(auto session : sessions_){
-            serializedSession_.push_back(serialization::GameSessionRepr(*session, sessionToTokenPlayer_.at(session)));
+            for (const auto& [token, plId] : sessionToTokenPlayer_.at(session->GetId())) {
+                auto player = players_.at(plId);
+                tokenPlayer.insert(std::make_pair(token, player));
+            }
+            serializedSession_.push_back(serialization::GameSessionRepr(*session, tokenPlayer));
         }
         return serializedSession_;
     }
@@ -214,10 +230,8 @@ namespace app {
                 tmpPlayer->SetDog(tmpDog);
                 tmpPlayer->SetGameSession(tmpGameSession);
                 tmpGameSession->SetDog(tmpDog);
-                tokenToSessionIndex_[tmpToken] = tmpGameSession;
-                sessionToTokenPlayer_[tmpGameSession][tmpToken] = tmpPlayer;
+                sessionToTokenPlayer_[tmpGameSession->GetId()][tmpToken] = tmpPlayer->GetId();
                 playerTokens_.SetPlayerToken(tmpToken, tmpPlayer);
-                sessionID_[tmpGameSession->GetId()].push_back(tmpPlayer);
 
             }
 
@@ -255,37 +269,21 @@ namespace app {
 
     void Application::DeleteAFKPlayers(const GameSession::Id& input_id) {
         //https://habr.com/ru/companies/piter/articles/706866/ шпаргалка по умным указателям
-        std::vector<auth::Token> tokensForDelete;
-        std::vector<std::shared_ptr<app::Player>> playersForDelete;
+        TokenPlayer tmpPlayersForDelete;
 
-        for (const auto& [id, players] : sessionID_) {
-
-            if (id == input_id) {
-                
-                for (const auto& plr : players) {
-                    if (plr.lock()->GetDog().use_count() == 0) {
-                        playersForDelete.push_back(plr.lock());
-                        tokensForDelete.push_back(playerTokens_.GetTokenByPlayer(plr).value());
-                    }
-                }
+        for (const auto& [token, id] : sessionToTokenPlayer_.at(input_id)) {
+            if (sessions_.at(input_id)->GetDogs().empty()) {
+                tmpPlayersForDelete.insert(std::make_pair(token, id));
             }
-        }
-
-        for (const auto& plr : playersForDelete) {
-            players_.erase(std::find(players_.begin(), players_.end(), plr));
-
-            auto session = plr.get()->GetSession();
-
-            for (const auto& token : tokensForDelete) {
-                sessionToTokenPlayer_[session].erase(token);
-            }
-        }
-
-        for (const auto& token :tokensForDelete) {
-            //auth::Token, std::shared_ptr<GameSession>
-            tokenToSessionIndex_.erase(token);
         }
         
+        auto deletePredicat = [&tmpPlayersForDelete](const auto& tokenPlrs) { return tmpPlayersForDelete.contains(tokenPlrs.first); };
+        std::erase_if(sessionToTokenPlayer_.at(input_id), deletePredicat);
+
+        for (const auto& [token, id] : tmpPlayersForDelete) {
+            players_.erase(id);
+        }
+
     }
 
     std::optional<std::vector<app::PlayerDataForPostgres>> Application::GetRecords(

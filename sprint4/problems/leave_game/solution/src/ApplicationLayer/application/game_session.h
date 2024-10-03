@@ -55,6 +55,9 @@ namespace app {
 
         /*Для загрузки игры*/
         void SetLostObject(model::LostObject obj);
+        std::shared_ptr<model::Dog> MakeDog(const std::string& name,
+                                            const model::Map& map,
+                                            bool randomize_spawn_points);
         void SetDog(std::shared_ptr<model::Dog> dog);
 
         //Методы для паттерна "Наблюдатель"
