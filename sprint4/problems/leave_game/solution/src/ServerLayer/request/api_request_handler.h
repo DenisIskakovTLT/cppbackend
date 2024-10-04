@@ -182,11 +182,23 @@ namespace requestHandler {
         if (application->FindMap(map_id) == nullptr) {
             return 0;
         }
-        auto [token, player_id] = application->JoinGame(player_name, map_id);
         StringResponse response(http::status::ok, req.version());
+        auto session = application->GetGameSessionByMapId(map_id);
+        std::string respBody;
+        if (session) {
+            boost::asio::dispatch(*(session->GetStrand()), [application, &player_name, &map_id, &respBody] {
+                auto [token, player_id] = application->JoinGame(player_name, map_id);
+                respBody = jsonOperation::JoinToGame(*token, *player_id);
+                });
+        }
+        else {
+            auto [token, player_id] = application->JoinGame(player_name, map_id);
+            respBody = jsonOperation::JoinToGame(*token, *player_id);
+        }
+
         response.set(http::field::content_type, "application/json");
         response.set(http::field::cache_control, "no-cache");
-        response.body() = jsonOperation::JoinToGame(*token, *player_id);
+        response.body() = respBody;
         response.content_length(response.body().size());
         response.keep_alive(req.keep_alive());
         send(response);
@@ -264,10 +276,16 @@ namespace requestHandler {
             return 0;
         }
         auto players = application->GetPlayersFromSession(token);
+        std::string respBody;
+        boost::asio::dispatch(*(application->GetGameSessionByToken(token)->GetStrand()),
+            [&token, application, &respBody, &players] {
+                respBody = jsonOperation::PlayersListOnMap(players);
+            }
+            );
         StringResponse response(http::status::ok, req.version());
         response.set(http::field::content_type, "application/json");
         response.set(http::field::cache_control, "no-cache");
-        response.body() = jsonOperation::PlayersListOnMap(players);
+        response.body() = respBody;
         response.content_length(response.body().size());
         response.keep_alive(req.keep_alive());
         send(response);
@@ -306,9 +324,20 @@ namespace requestHandler {
         }
         auto players = application->GetPlayersFromSession(token);
         StringResponse response(http::status::ok, req.version());
+        std::string respBody;
+
+        boost::asio::dispatch(*(application->GetGameSessionByToken(token)->GetStrand()),
+            [&token, application, &respBody, &players] {
+                auto session = application->GetGameSessionByToken(token);
+                if (!session) {
+                    return 0;
+                }
+                respBody = jsonOperation::GameState(players, application->GetGameSessionByToken(token)->GetLostObj());
+
+            });
         response.set(http::field::content_type, "application/json");
         response.set(http::field::cache_control, "no-cache");
-        response.body() = jsonOperation::GameState(players, application->GetGameSessionByToken(token)->GetLostObj());
+        response.body() = respBody;
         response.content_length(response.body().size());
         response.keep_alive(req.keep_alive());
         send(response);
