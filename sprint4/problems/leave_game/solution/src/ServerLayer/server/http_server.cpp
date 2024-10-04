@@ -18,12 +18,6 @@ void SessionBase::Run() {
     beast::bind_front_handler(&SessionBase::Read, GetSharedThis()));
 }
 
-
-SessionBase::SessionBase(tcp::socket&& socket)
-    : stream_(std::move(socket)) {
-}
-
-
 void SessionBase::Read() {
     using namespace std::literals;
     

@@ -26,7 +26,9 @@ void ErrorMessage(beast::error_code ec, std::string_view what);
 class SessionBase {
     // Напишите недостающий код, используя информацию из урока
 public:
-     
+
+    SessionBase(const SessionBase&) = delete;                           //Запрет на копирование
+    SessionBase& operator=(const SessionBase&) = delete;                //Запрет на присваивание
     void Run();                             //Запуск сессии
 
     const std::string& GetRemoteIp() {      //Геттер на айпи
@@ -45,19 +47,15 @@ public:
 
 protected:
 
+    explicit SessionBase(tcp::socket&& socket)
+        : stream_(std::move(socket)) {
+    }
 
     using HttpRequest = http::request<http::string_body>;
-    
-    SessionBase(const SessionBase&) = delete;                           //Запрет на копирование
-    SessionBase& operator=(const SessionBase&) = delete;                //Запрет на присваивание
 
     ~SessionBase() = default;                                           //Деструктор
 
-    /*Конструктор c explicit, чтобы не было никаких приведений типа, только явно.
-    У наследников будет тоже самое т.к. protected*/
-    explicit SessionBase(tcp::socket && socket);                        
-
-    /*Из теории*/
+     /*Из теории*/
     template <typename Body, typename Fields>
     void Write(http::response<Body, Fields> && response) {
         // Запись выполняется асинхронно, поэтому response перемещаем в область кучи
@@ -66,7 +64,7 @@ protected:
         auto self = GetSharedThis();
         http::async_write(stream_, *safe_response,
             [safe_response, self](beast::error_code ec, std::size_t bytes_written) {
-                self->OnWrite(safe_response->need_eof(), ec, bytes_written);
+                self->OnWrite(true, ec, bytes_written);
                 BOOST_LOG_TRIVIAL(info) << logger::CreateLogMessage("response sent"sv,
                     logger::ResponseLog<Body, Fields>(self->GetRemoteIp(),
                         self->GetDurReceivedRequest(boost::posix_time::microsec_clock::local_time()),
