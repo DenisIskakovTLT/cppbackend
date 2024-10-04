@@ -77,7 +77,9 @@ namespace app {
     void Application::UpdateGameState(const std::chrono::milliseconds& time) {
 
         for (auto [id, session] : sessions_) {
-            session->UpdateGameState(time);
+
+            net::dispatch(*(session->GetStrand()), [session, &time] {session->UpdateGameState(time); });
+            
         }
 
         SaveGamePeriodically(time);

@@ -460,7 +460,7 @@ namespace requestHandler {
         std::shared_ptr<app::Application> application,
         Send&& send) {
 
-        if (!application->CheckTimeManage()) {                                   //--tick-period передан
+        if (!application->CheckTimeManage()) {                                   //--tick-period передан?
             StringResponse response(http::status::bad_request, req.version());
             response.set(http::field::content_type, "application/json");
             response.set(http::field::cache_control, "no-cache");
