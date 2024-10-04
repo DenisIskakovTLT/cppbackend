@@ -156,7 +156,7 @@ namespace jsonOperation {
     };
 
     std::string PlayerAction() {
-        boost::json::value msg = { {} };
+        boost::json::object  msg = {};
         return boost::json::serialize(msg);
     };
 
