@@ -24,14 +24,14 @@ namespace app {
         auto player = CreatePlayer(name);
         auto token = playerTokens_.AddPlayer(player);
 
-        std::shared_ptr<GameSession> session = GetGameSessionByMapId(id);
+        auto session = GetGameSessionByMapId(id);
         if (!session) {
             session = std::make_shared<GameSession>(game_.FindMap(id), tickPeriod_, game_.GetLootGenConfig(), ioc_);
-            AddGameSession(session);
-            session->StartGame();
+            AddGameSession(session.value());
+            session.value()->StartGame();
         }
-        BindPlayerInSession(player, session);
-        sessionToTokenPlayer_[session->GetId()][token] = player->GetId();
+        BindPlayerInSession(player, session.value());
+        sessionToTokenPlayer_[session.value()->GetId()][token] = player->GetId();
         return std::tie(token, player->GetId());
     };
 
@@ -72,14 +72,14 @@ namespace app {
         return !playerTokens_.FindPlayerByToken(token).expired();
     };
 
-    /*Сюда попадаем, только если ручное управление временем. 
+    /*Сюда попадаем, только если ручное управление временем.
     При автоматическом управлении апдейтер будет вызывать тикер игры, а сохранения тикер сохранений*/
     void Application::UpdateGameState(const std::chrono::milliseconds& time) {
 
         for (auto [id, session] : sessions_) {
 
             net::dispatch(*(session->GetStrand()), [session, &time] {session->UpdateGameState(time); });
-            
+
         }
 
         SaveGamePeriodically(time);
@@ -95,12 +95,12 @@ namespace app {
         dog->Move(direction, speed);
     };
 
-    bool Application::CheckTimeManage() const{
+    bool Application::CheckTimeManage() const {
         return tickPeriod_.count() == 0;
     };
 
     void Application::AddGameSession(std::shared_ptr<GameSession> session) {
-        
+
         if (auto [it, inserted] = mapIdToSessionIndex_.emplace(session->GetMap()->GetId(), session->GetId()); !inserted) {
             throw std::invalid_argument("Game session with map id "s + *(session->GetMap()->GetId()) + " already exists"s);
         }
@@ -126,20 +126,20 @@ namespace app {
         session->SetDeleteAFKPlayersFuntional(DeleteLambda);
     };
 
-    std::shared_ptr<GameSession> Application::GetGameSessionByMapId(const model::Map::Id& id) const noexcept {
+    std::optional<std::shared_ptr<GameSession>> Application::GetGameSessionByMapId(const model::Map::Id& id) const noexcept {
         if (auto it = mapIdToSessionIndex_.find(id); it != mapIdToSessionIndex_.end()) {
             return sessions_.at(it->second);
         }
-        return nullptr;
+        return std::nullopt;
     };
 
-    std::shared_ptr<GameSession> Application::GetGameSessionByToken(const auth::Token& token) const noexcept {
+    std::optional<std::shared_ptr<GameSession>> Application::GetGameSessionByToken(const auth::Token& token) const noexcept {
         for (const auto& [id, tokPlay] : sessionToTokenPlayer_) {
             if (tokPlay.contains(token)) {
                 return sessions_.at(id);
             }
         }
-        return nullptr;
+        return std::nullopt;
     }
 
     void Application::SaveGame() {
@@ -161,7 +161,7 @@ namespace app {
     std::vector<serialization::GameSessionRepr> Application::SerializeGame() {
 
         std::vector<serialization::GameSessionRepr> serializedSession_;        //Сюда будем наполнять сериализированные данные
-        for(const auto& [id, session] : sessions_){
+        for (const auto& [id, session] : sessions_) {
             std::unordered_map < auth::Token, std::shared_ptr<app::Player>, auth::TokenHasher> tokenPlayer;
 
             for (const auto& [token, plId] : sessionToTokenPlayer_.at(session->GetId())) {
@@ -186,7 +186,7 @@ namespace app {
         }
 
         /*Включим тикер на сохранения*/
-        StartSaveTicker();   
+        StartSaveTicker();
         //Тикер используется, только при автоматическом управлении временем.
         //При ручном управлении временем используется SaveGamePeriodically
     }
@@ -281,7 +281,7 @@ namespace app {
                 tmpPlayersForDelete.insert(std::make_pair(token, id));
             }
         }
-        
+
         auto deletePredicat = [&tmpPlayersForDelete](const auto& tokenPlrs) { return tmpPlayersForDelete.contains(tokenPlrs.first); };
         std::erase_if(sessionToTokenPlayer_.at(input_id), deletePredicat);
 

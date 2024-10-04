@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.11)
 
 project(game_server CXX)
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g -Wall")
 
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup(TARGETS)
@@ -141,3 +142,5 @@ catch_discover_tests(game_server_tests)
 
 # Boost.Beast будет использовать std::string_view вместо boost::string_view
 add_compile_definitions(BOOST_BEAST_USE_STD_STRING_VIEW)
+
+add_compile_definitions(BOOST_THREAD_PROVIDES_FUTURE)

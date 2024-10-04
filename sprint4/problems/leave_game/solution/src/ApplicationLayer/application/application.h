@@ -55,8 +55,8 @@ namespace app {
         bool CheckTimeManage() const;                                                                       //Как управляем временем, вручную или нет
         void UpdateGameState(const std::chrono::milliseconds& time);                                        //апдейтим состояние игры
         void AddGameSession(std::shared_ptr<GameSession> session);                                          //Добавить сессию
-        std::shared_ptr<GameSession> GetGameSessionByMapId(const model::Map::Id& id) const noexcept;        //Геттер сессии по айди
-        std::shared_ptr<GameSession> GetGameSessionByToken(const auth::Token& token) const noexcept;        //Геттер сессии по токену
+        std::optional<std::shared_ptr<GameSession>>GetGameSessionByMapId(const model::Map::Id& id) const noexcept;//Геттер сессии по айди
+        std::optional<std::shared_ptr<GameSession>>GetGameSessionByToken(const auth::Token& token) const noexcept;//Геттер сессии по токену
         void LoadGameFromSave(savegame::SavedFileParameters parameters);                                    //Загрузить игру из файла
         void SaveGame();                                                                                    //Сохранить игру
         std::optional<std::vector<app::PlayerDataForPostgres>> GetRecords(                                  //Запрос из БД на таблицу рекордов
