@@ -32,7 +32,7 @@ namespace requestHandler {
                 if (item.GetActivator()(req)) {
                     auto res = item.GetHandler(req.method())(req, application, std::forward<Send>(send));
                     while (res.has_value()) {
-                        res = item.GetAddHandlerByIndex(res.value())(req, application, std::forward<Send>(send));
+                        res = item.GetAddHandlerByIndex(res.value()).value()(req, application, std::forward<Send>(send));
                     }
                     return true;
                 }

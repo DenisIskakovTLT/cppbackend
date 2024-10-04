@@ -22,7 +22,7 @@ namespace http_handler {
         RequestHandler(const RequestHandler&) = delete;
         RequestHandler& operator=(const RequestHandler&) = delete;
 
-        /*Новый обработчик, вроде короче...но вызывает сомнения в производительности. рошлый стал большим и нечитаемым*/
+
         template <typename Body, typename Allocator, typename Send>
         void operator()(http::request<Body, http::basic_fields<Allocator>>&& req, Send&& send) {// 
             // Обработать запрос request и отправить ответ, используя send

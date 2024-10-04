@@ -413,11 +413,11 @@ namespace requestHandler {
         if (!application->CheckPlayerByToken(token)) {
             return 0;
         }
+        std::string directionStr = jsonOperation::ParsePlayerActionRequest(req.body()).value();
         boost::asio::dispatch(*(application->GetGameSessionByToken(token)->GetStrand()),
-            [&token, &req, application]
+            [&token, &req, application, &directionStr]
             {
-                std::string directionStr = jsonOperation::ParsePlayerActionRequest(req.body()).value();
-                application->MovePlayer(token, model::JSON_TO_DIRECTION.at(directionStr));
+               application->MovePlayer(token, model::JSON_TO_DIRECTION.at(directionStr));
             });
 
         StringResponse response(http::status::ok, req.version());

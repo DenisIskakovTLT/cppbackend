@@ -87,6 +87,9 @@ namespace app {
 
     void Application::MovePlayer(const auth::Token& token, model::Direction direction) {
         auto player = playerTokens_.FindPlayerByToken(token).lock();
+        if (!player) {
+            return;
+        }
         auto dog = player->GetDog();
         double speed = player->GetSession()->GetMap()->GetDogSpeed();
         dog->Move(direction, speed);

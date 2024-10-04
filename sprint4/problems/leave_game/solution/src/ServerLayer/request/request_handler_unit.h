@@ -36,11 +36,11 @@ namespace requestHandler {
             }
         };
 
-        Handler GetAddHandlerByIndex(size_t idx) {
+        std::optional<Handler> GetAddHandlerByIndex(size_t idx) {
             if (idx < addHandlers_.size()) {
                 return addHandlers_[idx];
             }
-            return nullptr;
+            return std::nullopt;
         };
 
         Activator& GetActivator() {
