@@ -78,7 +78,7 @@ namespace app {
 
         for (auto [id, session] : sessions_) {
 
-            net::dispatch(*(session->GetStrand()), [session, &time] {session->UpdateGameState(time); });
+            session->UpdateGameState(time);
 
         }
 

@@ -414,15 +414,10 @@ namespace requestHandler {
             return 0;
         }
         auto directionStr = jsonOperation::ParsePlayerActionRequest(req.body());
-        if (!directionStr.has_value()) {
-            return std::nullopt;
+        if (!directionStr) {
+            return 0;
         }
-        boost::asio::dispatch(*(application->GetGameSessionByToken(token).value()->GetStrand()),
-            [&token, &req, application, &directionStr]
-            {
-                application->MovePlayer(token, model::JSON_TO_DIRECTION.at(directionStr.value()));
-            });
-
+        application->MovePlayer(token, model::JSON_TO_DIRECTION.at(directionStr.value()));
         StringResponse response(http::status::ok, req.version());
         response.set(http::field::content_type, "application/json");
         response.set(http::field::cache_control, "no-cache");
