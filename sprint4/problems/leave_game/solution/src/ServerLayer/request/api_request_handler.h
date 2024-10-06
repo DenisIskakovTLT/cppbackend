@@ -413,11 +413,14 @@ namespace requestHandler {
         if (!application->CheckPlayerByToken(token)) {
             return 0;
         }
-        std::string directionStr = jsonOperation::ParsePlayerActionRequest(req.body()).value();
+        auto directionStr = jsonOperation::ParsePlayerActionRequest(req.body());
+        if (!directionStr.has_value()) {
+            return std::nullopt;
+        }
         boost::asio::dispatch(*(application->GetGameSessionByToken(token).value()->GetStrand()),
             [&token, &req, application, &directionStr]
             {
-                application->MovePlayer(token, model::JSON_TO_DIRECTION.at(directionStr));
+                application->MovePlayer(token, model::JSON_TO_DIRECTION.at(directionStr.value()));
             });
 
         StringResponse response(http::status::ok, req.version());
@@ -508,8 +511,11 @@ namespace requestHandler {
             send(response);
         }
         else {
-            int delta_time = jsonOperation::ParseSetDeltaTimeRequest(req.body()).value();
-            std::chrono::milliseconds dtime(delta_time);
+            auto delta_time = jsonOperation::ParseSetDeltaTimeRequest(req.body());
+            if (!delta_time.has_value()) {
+                return std::nullopt;
+            }
+            std::chrono::milliseconds dtime(delta_time.value());
             application->UpdateGameState(dtime);
             StringResponse response(http::status::ok, req.version());
             response.set(http::field::content_type, "application/json");
