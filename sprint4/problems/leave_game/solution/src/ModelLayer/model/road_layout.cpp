@@ -83,8 +83,12 @@ namespace model {
 		auto start_roads = GetCoordinatesOfPosition(current_pos);
 		auto end_roads = GetCoordinatesOfPosition(target_pos);
 
+		if (!start_roads.has_value() || !end_roads.has_value()) {
+			return std::tie(current_pos, current_spd);
+		}
+
 		if (end_roads) {
-			if (!IsValidPosition(matrixMap_[end_roads.value().x][end_roads.value().y],
+			if (!IsValidPosition(matrixMap_.at(end_roads.value().x).at(end_roads.value().y),
 				target_pos)) {
 				end_roads = std::nullopt;
 			}
@@ -98,8 +102,7 @@ namespace model {
 			return std::tie(current_pos, current_spd);
 		}
 
-		//if (IsValidPosition(matrixMap_.at(dest.value().x).at(dest.value().y), target_pos)) {
-		if (true) {
+		if (IsValidPosition(matrixMap_.at(dest.value().x).at(dest.value().y), target_pos)) {
 			position = target_pos;
 			speed = current_spd;
 		}
@@ -132,8 +135,8 @@ namespace model {
 			int64_t index{ 0 };
 			for (index = start_coord.x; index != end_x; index += direction) {
 				if (IsValidCoordinates({ index, start_coord.y }) &&
-					IsCrossedSets(matrixMap_[start_coord.x][start_coord.y],
-						matrixMap_[index][start_coord.y])) {
+					IsCrossedSets(matrixMap_.at(start_coord.x).at(start_coord.y),
+						matrixMap_.at(index).at(start_coord.y))) {
 					current_coord = { index, start_coord.y };
 				}
 				else {
@@ -156,8 +159,8 @@ namespace model {
 			int64_t index{ 0 };
 			for (index = start_coord.y; index != end_y; index += direction) {
 				if (IsValidCoordinates({ start_coord.x, index }) &&
-					IsCrossedSets(matrixMap_[start_coord.x][start_coord.y],
-						matrixMap_[start_coord.x][index])) {
+					IsCrossedSets(matrixMap_.at(start_coord.x).at(start_coord.y),
+						matrixMap_.at(start_coord.x).at(index))) {
 					current_coord = { start_coord.x, index };
 				}
 				else {
@@ -176,7 +179,7 @@ namespace model {
 		int64_t x_index = (pos.x >= 0) ? std::floor(pos.x * CELL_FACTOR) : std::ceil(pos.x * CELL_FACTOR);
 		int64_t y_index = (pos.y >= 0) ? std::floor(pos.y * CELL_FACTOR) : std::ceil(pos.y * CELL_FACTOR);
 		if (matrixMap_.contains(x_index)) {
-			if (matrixMap_[x_index].contains(y_index)) {
+			if (matrixMap_.at(x_index).contains(y_index)) {
 				return MapCoord{ x_index, y_index };
 			}
 		}
@@ -194,7 +197,7 @@ namespace model {
 
 	bool RoadLayout::IsValidCoordinates(const MapCoord& coord) {
 		if (matrixMap_.contains(coord.x)) {
-			return matrixMap_[coord.x].contains(coord.y);
+			return matrixMap_.at(coord.x).contains(coord.y);
 		}
 		return false;
 	};
@@ -205,7 +208,7 @@ namespace model {
 		geom::Point2D res_position{ current_pos };
 		auto cell_pos = MatrixCoordinateToPosition(roads_coord, current_pos);
 		auto direction = SpeedToDirection(current_spd);
-		for (auto road_ind : matrixMap_[roads_coord.x][roads_coord.y]) {
+		for (auto road_ind : matrixMap_.at(roads_coord.x).at(roads_coord.y)) {
 			auto start_position = cell_pos.at(OPOSITE_DIRECTION.at(direction));
 			auto end_position = cell_pos.at(direction);
 			if (IsValidPositionOnRoad(roads_[road_ind], start_position)) {
