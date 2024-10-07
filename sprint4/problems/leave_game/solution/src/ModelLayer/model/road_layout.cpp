@@ -97,7 +97,7 @@ namespace model {
 		if (!dest.has_value()) {
 			return std::tie(current_pos, current_spd);
 		}
-		if (IsValidPosition(matrixMap_[dest.value().x][dest.value().y], target_pos)) {
+		if (IsValidPosition(matrixMap_.at(dest.value().x).at(dest.value().y), target_pos)) {
 			position = target_pos;
 			speed = current_spd;
 		}
