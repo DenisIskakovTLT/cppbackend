@@ -107,6 +107,9 @@ namespace model {
 		std::optional<const MapCoord> start,
 		std::optional<const MapCoord> end,
 		const Speed& current_spd) {
+		if (!start.has_value() || !end.has_value()) {
+			return std::nullopt;
+		}
 		const MapCoord start_coord = start.value();
 		MapCoord current_coord = start_coord;
 		if (current_spd.vx != 0) {
