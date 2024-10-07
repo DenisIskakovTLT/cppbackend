@@ -83,10 +83,6 @@ namespace model {
 		auto start_roads = GetCoordinatesOfPosition(current_pos);
 		auto end_roads = GetCoordinatesOfPosition(target_pos);
 
-		if (!start_roads.has_value() || !end_roads.has_value()) {
-			return std::tie(current_pos, current_spd);
-		}
-
 		if (end_roads) {
 			if (!IsValidPosition(matrixMap_.at(end_roads.value().x).at(end_roads.value().y),
 				target_pos)) {
@@ -106,7 +102,7 @@ namespace model {
 			speed = current_spd;
 		}
 		else {
-			position = GetFarthestPoinOfRoute(dest.value(), current_pos, current_spd);
+			position = current_pos//;GetFarthestPoinOfRoute(dest.value(), current_pos, current_spd);
 		}
 		return std::tie(current_pos, current_spd);
 	};
@@ -115,9 +111,7 @@ namespace model {
 		std::optional<const MapCoord> start,
 		std::optional<const MapCoord> end,
 		const Speed& current_spd) {
-		if (!start.has_value() || !end.has_value()) {
-			return std::nullopt;
-		}
+
 		const MapCoord start_coord = start.value();
 		MapCoord current_coord = start_coord;
 		if (current_spd.vx != 0) {
