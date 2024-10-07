@@ -101,15 +101,14 @@ namespace model {
 		if (dest.has_value()) {
 			return std::tie(current_pos, current_spd);
 		}
-
 		if (IsValidPosition(matrixMap_.at(dest.value().x).at(dest.value().y), target_pos)) {
 			position = target_pos;
 			speed = current_spd;
 		}
 		else {
-			position = current_pos;
+			position = GetFarthestPoinOfRoute(dest.value(), current_pos, current_spd);
 		}
-		return std::tie(position, speed);
+		return std::tie(current_pos, current_spd);
 	};
 
 	std::optional<const RoadLayout::MapCoord> RoadLayout::GetDestinationRoadsOfRoute(

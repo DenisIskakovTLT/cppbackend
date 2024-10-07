@@ -323,25 +323,10 @@ namespace requestHandler {
             return 0;
         }
         auto players = application->GetPlayersFromSession(token);
-
-        std::string respBody;
-
-        boost::asio::dispatch(*(application->GetGameSessionByToken(token).value()->GetStrand()),
-            [&token, application, &respBody, &players] {
-                auto session = application->GetGameSessionByToken(token).value();
-                if (!session) {
-                    return;
-                }
-                respBody = jsonOperation::GameState(players, application->GetGameSessionByToken(token).value()->GetLostObj());
-
-            });
-        if (respBody.empty()) {
-            return 0;
-        }
         StringResponse response(http::status::ok, req.version());
         response.set(http::field::content_type, "application/json");
         response.set(http::field::cache_control, "no-cache");
-        response.body() = respBody;
+        response.body() = jsonOperation::GameState(players, application->GetGameSessionByToken(token).value()->GetLostObj());
         response.content_length(response.body().size());
         response.keep_alive(req.keep_alive());
         send(response);
