@@ -78,7 +78,10 @@ namespace model {
 	std::tuple<geom::Point2D, Speed> RoadLayout::GetValidMove(const geom::Point2D& current_pos,
 		const geom::Point2D& target_pos,
 		const Speed& current_spd) {
+		geom::Point2D position;
 		Speed speed = { 0, 0 };
+		//auto start_roads = RoadLayout::MapCoord{ 0 , 0 };
+		//auto end_roads = RoadLayout::MapCoord{ 0 , 0 };
 		auto start_roads = GetCoordinatesOfPosition(current_pos);
 		auto end_roads = GetCoordinatesOfPosition(target_pos);
 		if (end_roads) {
@@ -90,16 +93,16 @@ namespace model {
 				return std::tie(target_pos, current_spd);
 			}
 		}
-		auto dest = GetDestinationRoadsOfRoute(start_roads, end_roads, current_spd);
-		geom::Point2D position;
-		if (dest && IsValidPosition(matrixMap_[dest.value().x][dest.value().y], target_pos)) {
-			position = target_pos;
-			speed = current_spd;
-		}
-		else {
-			//position = GetFarthestPoinOfRoute(dest.value(), current_pos, current_spd);
-			position = current_pos;
-		}
+		//auto dest = GetDestinationRoadsOfRoute(start_roads, end_roads, current_spd);
+		//
+		//if (dest && IsValidPosition(matrixMap_[dest.value().x][dest.value().y], target_pos)) {
+		//	position = target_pos;
+		//	speed = current_spd;
+		//}
+		//else {
+		//	//position = GetFarthestPoinOfRoute(dest.value(), current_pos, current_spd);
+		//	position = current_pos;
+		//}
 		return std::tie(position, speed);
 	};
 

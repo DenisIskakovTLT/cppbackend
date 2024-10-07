@@ -61,12 +61,12 @@ namespace app {
         bool noMove = true;
         for (auto [id, dog] : dogs_) {
 
-            //auto [new_pos, new_speed] = map_->GetMove(
-            //    dog->GetPosition(),
-            //    dog->CalculateNewPosition(period),
-            //    dog->GetSpeed()
-            //);
-            auto [new_pos, new_speed] = std::make_tuple(dog->GetPosition(), dog->GetSpeed());
+            auto [new_pos, new_speed] = map_->GetMove(
+                dog->GetPosition(),
+                dog->CalculateNewPosition(period),
+                dog->GetSpeed()
+            );
+
             if (dog->GetPosition() != new_pos) {
                 noMove = false;
             }
