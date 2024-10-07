@@ -80,10 +80,13 @@ namespace model {
 		const Speed& current_spd) {
 		geom::Point2D position;
 		Speed speed = { 0, 0 };
-		//auto start_roads = RoadLayout::MapCoord{ 0 , 0 };
-		//auto end_roads = RoadLayout::MapCoord{ 0 , 0 };
 		auto start_roads = GetCoordinatesOfPosition(current_pos);
 		auto end_roads = GetCoordinatesOfPosition(target_pos);
+
+		if (!start_roads.has_value() || !end_roads.has_value()) {
+			return std::tie(current_pos, current_spd);
+		}
+
 		if (end_roads) {
 			if (!IsValidPosition(matrixMap_[end_roads.value().x][end_roads.value().y],
 				target_pos)) {
@@ -93,15 +96,11 @@ namespace model {
 				return std::tie(target_pos, current_spd);
 			}
 		}
+
 		auto dest = GetDestinationRoadsOfRoute(start_roads, end_roads, current_spd);
-		if (dest.has_value()) {
-			if (IsValidPosition(matrixMap_[dest.value().x][dest.value().y], target_pos)) {
-				position = target_pos;
-				speed = current_spd;
-			}
-			else {
-				position = current_pos;
-			}
+		if (IsValidPosition(matrixMap_[dest.value().x][dest.value().y], target_pos)) {
+			position = target_pos;
+			speed = current_spd;
 		}
 		else {
 			position = current_pos;
