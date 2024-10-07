@@ -102,7 +102,7 @@ namespace model {
 			speed = current_spd;
 		}
 		else {
-			position = current_pos//;GetFarthestPoinOfRoute(dest.value(), current_pos, current_spd);
+			position = current_pos;//;GetFarthestPoinOfRoute(dest.value(), current_pos, current_spd);
 		}
 		return std::tie(current_pos, current_spd);
 	};
