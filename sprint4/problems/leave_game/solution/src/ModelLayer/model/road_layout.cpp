@@ -94,10 +94,14 @@ namespace model {
 		}
 
 		auto dest = GetDestinationRoadsOfRoute(start_roads, end_roads, current_spd);
-		if (!dest.has_value()) {
-			return std::tie(current_pos, current_spd);
+		int64_t x = current_pos.x;
+		int64_t y = current_pos.y;
+		if (dest.has_value()) {
+			x = dest.value().x;
+			y = dest.value().y;
+			//return std::tie(current_pos, current_spd);
 		}
-		if (IsValidPosition(matrixMap_.at(dest.value().x).at(dest.value().y), target_pos)) {
+		if (IsValidPosition(matrixMap_.at(x).at(y), target_pos)) {
 			position = target_pos;
 			speed = current_spd;
 		}
