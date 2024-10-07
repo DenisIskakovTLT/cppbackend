@@ -82,7 +82,7 @@ namespace app {
 
         }
 
-        //SaveGamePeriodically(time);
+        SaveGamePeriodically(time);
     };
 
     void Application::MovePlayer(const auth::Token& token, model::Direction direction) {
