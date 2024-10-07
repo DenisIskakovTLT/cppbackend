@@ -83,10 +83,6 @@ namespace model {
 		auto start_roads = GetCoordinatesOfPosition(current_pos);
 		auto end_roads = GetCoordinatesOfPosition(target_pos);
 
-		if (!start_roads.has_value() || !end_roads.has_value()) {
-			return std::tie(current_pos, current_spd);
-		}
-
 		if (end_roads) {
 			if (!IsValidPosition(matrixMap_[end_roads.value().x][end_roads.value().y],
 				target_pos)) {
@@ -98,6 +94,9 @@ namespace model {
 		}
 
 		auto dest = GetDestinationRoadsOfRoute(start_roads, end_roads, current_spd);
+		if (!dest.has_value()) {
+			std::tie(current_pos, current_spd);
+		}
 		if (IsValidPosition(matrixMap_[dest.value().x][dest.value().y], target_pos)) {
 			position = target_pos;
 			speed = current_spd;
