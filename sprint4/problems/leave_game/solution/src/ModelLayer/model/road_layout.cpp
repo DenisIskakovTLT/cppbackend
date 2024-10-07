@@ -93,16 +93,19 @@ namespace model {
 				return std::tie(target_pos, current_spd);
 			}
 		}
-		//auto dest = GetDestinationRoadsOfRoute(start_roads, end_roads, current_spd);
-		//
-		//if (dest && IsValidPosition(matrixMap_[dest.value().x][dest.value().y], target_pos)) {
-		//	position = target_pos;
-		//	speed = current_spd;
-		//}
-		//else {
-		//	//position = GetFarthestPoinOfRoute(dest.value(), current_pos, current_spd);
-		//	position = current_pos;
-		//}
+		auto dest = GetDestinationRoadsOfRoute(start_roads, end_roads, current_spd);
+		if (dest.has_value()) {
+			if (IsValidPosition(matrixMap_[dest.value().x][dest.value().y], target_pos)) {
+				position = target_pos;
+				speed = current_spd;
+			}
+			else {
+				position = current_pos;
+			}
+		}
+		else {
+			position = current_pos;
+		}
 		return std::tie(position, speed);
 	};
 
